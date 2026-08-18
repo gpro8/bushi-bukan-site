@@ -121,6 +121,40 @@ export async function loadSnap(raw: string): Promise<ChainSnap> {
   }
 }
 
+export const BUKAN_API =
+  (import.meta.env.VITE_BUKAN_API as string | undefined) ||
+  "https://bushi-bukan-api.bushidao.workers.dev";
+
+export type GiSnap = {
+  total: number;
+  quality: number;
+  participation: number;
+  media: number;
+  other: number;
+  bonus: number;
+  recent7d: number;
+  rank: number;
+  cohort: number;
+};
+
+export async function loadGi(wallet: string): Promise<{ linked: boolean; gi: GiSnap | null }> {
+  try {
+    const res = await fetch(
+      `${BUKAN_API.replace(/\/$/, "")}/v1/bukan?wallet=${encodeURIComponent(wallet)}`,
+      { headers: { Accept: "application/json" } }
+    );
+    const data = (await res.json()) as {
+      ok?: boolean;
+      linked?: boolean;
+      gi?: GiSnap | null;
+    };
+    if (!data?.ok) return { linked: false, gi: null };
+    return { linked: Boolean(data.linked), gi: data.gi ?? null };
+  } catch {
+    return { linked: false, gi: null };
+  }
+}
+
 export type NextKey = { id: string; labelJa: string; href?: string };
 
 /** On-chain only until Worker fills Gi. */

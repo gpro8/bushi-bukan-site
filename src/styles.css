@@ -127,6 +127,22 @@ h2 {
 .muted-big {
   color: var(--muted);
 }
+.lane {
+  font-size: 0.88rem;
+  margin-top: 0.35rem;
+}
+.line {
+  height: 8px;
+  background: var(--line);
+  border-radius: 99px;
+  margin: 0.18rem 0 0.08rem;
+}
+.line > i {
+  display: block;
+  height: 100%;
+  background: #c8862a;
+  border-radius: 99px;
+}
 .muted {
   color: var(--muted);
   font-size: 0.88rem;

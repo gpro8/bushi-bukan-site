@@ -2,15 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import {
   DENI,
   deniOf,
+  loadGi,
   loadSnap,
   nextKeyFromChain,
   parseWalletParam,
   setWalletParam,
   shortAddr,
   type ChainSnap,
+  type GiSnap,
   type NextKey,
 } from "./chain";
 import { toggleTheme, type ThemeMode } from "./theme";
+
+function pct(part: number, total: number) {
+  if (!total || part <= 0) return 0;
+  return Math.min(100, Math.round((part / total) * 100));
+}
 
 export function App() {
   const [theme, setTheme] = useState<ThemeMode>(
@@ -20,17 +27,24 @@ export function App() {
   );
   const [input, setInput] = useState(parseWalletParam);
   const [snap, setSnap] = useState<ChainSnap | null>(null);
+  const [gi, setGi] = useState<GiSnap | null>(null);
+  const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const lookup = async (raw: string) => {
     setErr(null);
     setBusy(true);
+    setGi(null);
+    setGiLinked(null);
     try {
       const s = await loadSnap(raw);
       setSnap(s);
       setInput(s.wallet);
       setWalletParam(s.wallet);
+      const g = await loadGi(s.wallet);
+      setGi(g.gi);
+      setGiLinked(g.linked);
     } catch (e) {
       setSnap(null);
       setErr(e instanceof Error ? e.message : "読み取れませんでした");
@@ -93,7 +107,7 @@ export function App() {
         <section className="meishi">
           <h1>武鑑</h1>
           <p>義と伝位の名鑑。ウォレットを入れると、検定と伝位を鎖から読みます。</p>
-          <p className="muted">義（Gi）と位階は Worker 接続後に表示します。今は保有層のみ。</p>
+          <p className="muted">義はウォレット連携済みなら同じ数字を表示します（Discord 名は出しません）。</p>
           {err && <p className="err">{err}</p>}
         </section>
       )}
@@ -115,17 +129,53 @@ export function App() {
               )}
             </div>
             <div className="sub">
-              位階 · 義 — Worker 後 · Rank は義を増やさない
+              {gi
+                ? `位階 #${gi.rank} / ${gi.cohort} · 直近7日 +${gi.recent7d} · Rank は義を増やさない`
+                : giLinked === false
+                  ? "義未連携（ウォレットを Discord でリンク） · Rank は義を増やさない"
+                  : "義を読み込み中 / 未接続 · Rank は義を増やさない"}
             </div>
           </div>
 
           <div className="grid">
             <div className="col">
               <h2>貢献層</h2>
-              <div className="big muted-big">—</div>
-              <p className="muted">
-                表示 Gi / 質 / 会話 / 画像 / ボーナスは Discord と同じ数字を Worker が返します。ブラウザは bot DB を開きません。
-              </p>
+              {gi ? (
+                <>
+                  <div className="big">
+                    {gi.total} <span style={{ fontSize: "1rem" }}>義</span>
+                  </div>
+                  <p className="lane">質 {gi.quality}</p>
+                  <div className="line">
+                    <i style={{ width: `${pct(gi.quality, gi.total)}%` }} />
+                  </div>
+                  <p className="lane">会話 {gi.participation}</p>
+                  <div className="line">
+                    <i style={{ width: `${pct(gi.participation, gi.total)}%` }} />
+                  </div>
+                  <p className="lane">画像 {gi.media}</p>
+                  <div className="line">
+                    <i style={{ width: `${pct(gi.media, gi.total)}%` }} />
+                  </div>
+                  <p className="lane">その他 {gi.other}</p>
+                  <div className="line">
+                    <i style={{ width: `${pct(gi.other, gi.total)}%` }} />
+                  </div>
+                  <p className="lane">ボーナス {gi.bonus}</p>
+                  <div className="line">
+                    <i style={{ width: `${pct(gi.bonus, gi.total)}%` }} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="big muted-big">—</div>
+                  <p className="muted">
+                    {giLinked === false
+                      ? "このウォレットはまだ Discord と連携されていません。"
+                      : "義は bot と同じ数字です。今は未接続です。"}
+                  </p>
+                </>
+              )}
             </div>
             <div className="col hold">
               <h2>保有層</h2>

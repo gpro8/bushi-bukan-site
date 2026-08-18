@@ -1,5 +1,6 @@
 import {
   createPublicClient,
+  fallback,
   http,
   isAddress,
   getAddress,
@@ -13,12 +14,15 @@ export const RANK = "0xCb454D0Da9536cC8CA01CF2B1B3D441fb25b4eaa" as Address;
 export const EXAM_URL = "https://giuliav6-ai.github.io/web3-kentei/";
 export const SUKEDACHI_URL = "https://gpro8.github.io/sukedachi-site/";
 
-const RPC =
-  (import.meta.env.VITE_RPC_URL as string | undefined) || "https://mainnet.base.org";
+const RPCS = [
+  import.meta.env.VITE_RPC_URL as string | undefined,
+  "https://base.publicnode.com",
+  "https://mainnet.base.org",
+].filter((u): u is string => Boolean(u));
 
 export const client = createPublicClient({
   chain: base,
-  transport: http(RPC),
+  transport: fallback(RPCS.map((url) => http(url, { timeout: 12_000 }))),
 });
 
 export const DENI = [
@@ -70,44 +74,51 @@ export type ChainSnap = {
   wallet: Address;
   rank: number;
   exam: boolean[];
-  thresholds: bigint[];
 };
+
+export function friendlyRpcError(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e);
+  const low = raw.toLowerCase();
+  if (
+    low.includes("rate limit") ||
+    low.includes("429") ||
+    low.includes("over rate")
+  ) {
+    return "混み合っています。少し待ってから、もう一度「見る」を押してください。";
+  }
+  if (low.includes("failed to fetch") || low.includes("network")) {
+    return "接続できませんでした。通信を確認して再試行してください。";
+  }
+  return "読み取れませんでした。アドレスを確認して再試行してください。";
+}
 
 export async function loadSnap(raw: string): Promise<ChainSnap> {
   if (!isAddress(raw)) throw new Error("ウォレットアドレスを入力してください");
   const wallet = getAddress(raw);
-  const examCalls = DENI.map((d) =>
-    client.readContract({
-      address: EXAM,
-      abi: EXAM_ABI,
-      functionName: "hasExamPass",
-      args: [wallet, d.tier],
-    })
-  );
-  const thCalls = DENI.map((d) =>
-    client.readContract({
-      address: RANK,
-      abi: RANK_ABI,
-      functionName: "giThresholds",
-      args: [d.tier],
-    })
-  );
-  const [rank, exam, thresholds] = await Promise.all([
-    client.readContract({
+  try {
+    const rank = await client.readContract({
       address: RANK,
       abi: RANK_ABI,
       functionName: "currentRank",
       args: [wallet],
-    }),
-    Promise.all(examCalls),
-    Promise.all(thCalls),
-  ]);
-  return {
-    wallet,
-    rank: Number(rank),
-    exam: exam.map(Boolean),
-    thresholds,
-  };
+    });
+    const exam = await client.multicall({
+      allowFailure: false,
+      contracts: DENI.map((d) => ({
+        address: EXAM,
+        abi: EXAM_ABI,
+        functionName: "hasExamPass" as const,
+        args: [wallet, d.tier] as const,
+      })),
+    });
+    return {
+      wallet,
+      rank: Number(rank),
+      exam: exam.map(Boolean),
+    };
+  } catch (e) {
+    throw new Error(friendlyRpcError(e));
+  }
 }
 
 export type NextKey = { id: string; labelJa: string; href?: string };

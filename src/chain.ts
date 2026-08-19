@@ -236,9 +236,17 @@ export async function loadSuke(wallet: string): Promise<SukeSnap | null> {
   }
 }
 
-export async function loadGi(
-  wallet: string
-): Promise<{ linked: boolean; gi: GiSnap | null; suke: SukeSnap | null }> {
+export type EventSnap = {
+  asobi?: { lit: boolean; vols: number[]; tier: number };
+  auction_test?: { lit: boolean; tier: number };
+  sukedachi_test?: { lit: boolean; tier: number };
+};
+
+export async function loadGi(wallet: string): Promise<{
+  linked: boolean;
+  gi: GiSnap | null;
+  events: EventSnap | null;
+}> {
   try {
     const res = await fetch(
       `${BUKAN_API.replace(/\/$/, "")}/v1/bukan?wallet=${encodeURIComponent(wallet)}`,
@@ -248,16 +256,16 @@ export async function loadGi(
       ok?: boolean;
       linked?: boolean;
       gi?: GiSnap | null;
-      sukedachi?: SukeSnap | null;
+      events?: EventSnap | null;
     };
-    if (!data?.ok) return { linked: false, gi: null, suke: null };
+    if (!data?.ok) return { linked: false, gi: null, events: null };
     return {
       linked: Boolean(data.linked),
       gi: data.gi ?? null,
-      suke: null,
+      events: data.events ?? null,
     };
   } catch {
-    return { linked: false, gi: null, suke: null };
+    return { linked: false, gi: null, events: null };
   }
 }
 

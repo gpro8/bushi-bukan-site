@@ -10,10 +10,12 @@ import {
   setWalletParam,
   shortAddr,
   type ChainSnap,
+  type EventSnap,
   type GiSnap,
   type NextKey,
   type SukeSnap,
 } from "./chain";
+import { collectBadges } from "./badges";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -31,6 +33,7 @@ export function App() {
   const [snap, setSnap] = useState<ChainSnap | null>(null);
   const [gi, setGi] = useState<GiSnap | null>(null);
   const [suke, setSuke] = useState<SukeSnap | null>(null);
+  const [events, setEvents] = useState<EventSnap | null>(null);
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,6 +43,7 @@ export function App() {
     setBusy(true);
     setGi(null);
     setSuke(null);
+    setEvents(null);
     setGiLinked(null);
     try {
       const s = await loadSnap(raw);
@@ -49,6 +53,7 @@ export function App() {
       const g = await loadGi(s.wallet);
       setGi(g.gi);
       setGiLinked(g.linked);
+      setEvents(g.events);
       const sk = await loadSuke(s.wallet);
       setSuke(sk);
     } catch (e) {
@@ -197,40 +202,12 @@ export function App() {
           <div className="shelf">
             <h2>所持家紋</h2>
             <div className="mons">
-              {DENI.map((d, i) => (
-                <div key={d.code} className={snap.exam[i] ? "mon" : "mon off"}>
-                  <i>梅</i>
-                  検定・{d.ja}
+              {collectBadges(snap, suke, events).map((b) => (
+                <div key={b.id} className={b.lit ? "mon" : "mon off"}>
+                  <i>{b.glyph}</i>
+                  {b.label}
                 </div>
               ))}
-              <div className={snap.rank > 0 ? "mon" : "mon off"}>
-                <i>菊</i>
-                伝位{deni ? `・${deni.ja}` : ""}
-              </div>
-              <div className={suke?.flag.lit ? "mon" : "mon off"}>
-                <i>幟</i>
-                {suke?.flag.tier === 5
-                  ? "旗手・5"
-                  : suke?.flag.lit
-                    ? "旗手"
-                    : "旗手"}
-              </div>
-              <div className={suke?.kase.lit ? "mon" : "mon off"}>
-                <i>七</i>
-                {suke?.kase.lit
-                  ? suke.kase.omoi
-                    ? `加勢・${suke.kase.omoi}`
-                    : "加勢した"
-                  : "加勢"}
-              </div>
-              <div className={suke?.gien.lit ? "mon" : "mon off"}>
-                <i>水</i>
-                {suke?.gien.lit
-                  ? suke.gien.omoi
-                    ? `義援・${suke.gien.omoi}`
-                    : "義援した"
-                  : "義援"}
-              </div>
             </div>
           </div>
 

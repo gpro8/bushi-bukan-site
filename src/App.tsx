@@ -4,6 +4,7 @@ import {
   deniOf,
   loadGi,
   loadSnap,
+  loadSuke,
   nextKeyFromChain,
   parseWalletParam,
   setWalletParam,
@@ -47,8 +48,9 @@ export function App() {
       setWalletParam(s.wallet);
       const g = await loadGi(s.wallet);
       setGi(g.gi);
-      setSuke(g.suke);
       setGiLinked(g.linked);
+      const sk = await loadSuke(s.wallet);
+      setSuke(sk);
     } catch (e) {
       setSnap(null);
       setErr(e instanceof Error ? e.message : "読み取れませんでした");

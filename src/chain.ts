@@ -151,6 +151,91 @@ export type SukeSnap = {
   gien: SukeFamily;
 };
 
+const SUKE_API = "https://sukedachi-polygon-rpc.bushidao.workers.dev";
+
+function countTier(n: number) {
+  if (n <= 0) return 0;
+  if (n >= 5) return 5;
+  return 1;
+}
+
+function omoiBand(yen: number): string | null {
+  if (yen <= 0) return null;
+  if (yen >= 10000) return "義";
+  if (yen >= 1000) return "志";
+  return "心";
+}
+
+function yen18(total: string) {
+  try {
+    return Number(BigInt(total || "0") / 1000000000000000000n);
+  } catch {
+    return 0;
+  }
+}
+
+export async function loadSuke(wallet: string): Promise<SukeSnap | null> {
+  try {
+    const w = wallet.toLowerCase();
+    const campsRes = await fetch(`${SUKE_API}/v1/campaigns`);
+    const camps = (await campsRes.json()) as {
+      campaigns?: { address?: string; creator?: string; kind?: string }[];
+    };
+    const list = camps.campaigns || [];
+    let started = 0;
+    let kaseTimes = 0;
+    let kaseYen = 0;
+    let gienTimes = 0;
+    let gienYen = 0;
+    for (const c of list) {
+      const addr = (c.address || "").toLowerCase();
+      const creator = (c.creator || "").toLowerCase();
+      const kind = c.kind === "charity" ? "charity" : "crowdfund";
+      if (creator === w) started += 1;
+      if (!addr) continue;
+      try {
+        const cr = await fetch(
+          `${SUKE_API}/contributors?address=${addr}&kind=${kind}`
+        );
+        const cj = (await cr.json()) as {
+          rows?: { address?: string; total?: string }[];
+        };
+        const row = (cj.rows || []).find(
+          (r) => (r.address || "").toLowerCase() === w
+        );
+        if (!row) continue;
+        const y = yen18(row.total || "0");
+        if (kind === "charity") {
+          gienTimes += 1;
+          gienYen += y;
+        } else {
+          kaseTimes += 1;
+          kaseYen += y;
+        }
+      } catch {
+        /* skip one 旗 */
+      }
+    }
+    return {
+      flag: { started, tier: countTier(started), lit: started > 0 },
+      kase: {
+        joined: kaseTimes,
+        tier: countTier(kaseTimes),
+        omoi: omoiBand(kaseYen),
+        lit: kaseTimes > 0,
+      },
+      gien: {
+        joined: gienTimes,
+        tier: countTier(gienTimes),
+        omoi: omoiBand(gienYen),
+        lit: gienTimes > 0,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function loadGi(
   wallet: string
 ): Promise<{ linked: boolean; gi: GiSnap | null; suke: SukeSnap | null }> {
@@ -169,7 +254,7 @@ export async function loadGi(
     return {
       linked: Boolean(data.linked),
       gi: data.gi ?? null,
-      suke: data.sukedachi ?? null,
+      suke: null,
     };
   } catch {
     return { linked: false, gi: null, suke: null };

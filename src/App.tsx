@@ -11,6 +11,7 @@ import {
   type ChainSnap,
   type GiSnap,
   type NextKey,
+  type SukeSnap,
 } from "./chain";
 import { toggleTheme, type ThemeMode } from "./theme";
 
@@ -28,6 +29,7 @@ export function App() {
   const [input, setInput] = useState(parseWalletParam);
   const [snap, setSnap] = useState<ChainSnap | null>(null);
   const [gi, setGi] = useState<GiSnap | null>(null);
+  const [suke, setSuke] = useState<SukeSnap | null>(null);
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -36,6 +38,7 @@ export function App() {
     setErr(null);
     setBusy(true);
     setGi(null);
+    setSuke(null);
     setGiLinked(null);
     try {
       const s = await loadSnap(raw);
@@ -44,6 +47,7 @@ export function App() {
       setWalletParam(s.wallet);
       const g = await loadGi(s.wallet);
       setGi(g.gi);
+      setSuke(g.suke);
       setGiLinked(g.linked);
     } catch (e) {
       setSnap(null);
@@ -201,11 +205,29 @@ export function App() {
                 <i>菊</i>
                 伝位{deni ? `・${deni.ja}` : ""}
               </div>
-              <div className="mon off">
-                <i>七</i>加勢
+              <div className={suke?.flag.lit ? "mon" : "mon off"}>
+                <i>幟</i>
+                {suke?.flag.tier === 5
+                  ? "旗手・5"
+                  : suke?.flag.lit
+                    ? "旗手"
+                    : "旗手"}
               </div>
-              <div className="mon off">
-                <i>幟</i>旗手
+              <div className={suke?.kase.lit ? "mon" : "mon off"}>
+                <i>七</i>
+                {suke?.kase.lit
+                  ? suke.kase.omoi
+                    ? `加勢・${suke.kase.omoi}`
+                    : "加勢した"
+                  : "加勢"}
+              </div>
+              <div className={suke?.gien.lit ? "mon" : "mon off"}>
+                <i>水</i>
+                {suke?.gien.lit
+                  ? suke.gien.omoi
+                    ? `義援・${suke.gien.omoi}`
+                    : "義援した"
+                  : "義援"}
               </div>
             </div>
           </div>

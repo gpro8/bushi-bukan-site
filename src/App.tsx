@@ -13,6 +13,7 @@ import {
   type EventSnap,
   type GiSnap,
   type NextKey,
+  type PublicDiscord,
   type SukeSnap,
 } from "./chain";
 import { collectBadges } from "./badges";
@@ -34,6 +35,7 @@ export function App() {
   const [gi, setGi] = useState<GiSnap | null>(null);
   const [suke, setSuke] = useState<SukeSnap | null>(null);
   const [events, setEvents] = useState<EventSnap | null>(null);
+  const [pub, setPub] = useState<PublicDiscord | null>(null);
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -44,6 +46,7 @@ export function App() {
     setGi(null);
     setSuke(null);
     setEvents(null);
+    setPub(null);
     setGiLinked(null);
     try {
       const s = await loadSnap(raw);
@@ -54,6 +57,7 @@ export function App() {
       setGi(g.gi);
       setGiLinked(g.linked);
       setEvents(g.events);
+      setPub(g.discord);
       const sk = await loadSuke(s.wallet);
       setSuke(sk);
     } catch (e) {
@@ -118,7 +122,7 @@ export function App() {
         <section className="meishi">
           <h1>武鑑</h1>
           <p>義と伝位の名鑑。ウォレットを入れると、検定と伝位を鎖から読みます。</p>
-          <p className="muted">義はウォレット連携済みなら同じ数字を表示します（Discord 名は出しません）。</p>
+          <p className="muted">義はウォレット連携済みなら同じ数字を表示します。Discord 名は本人が `/bukan_public` したときだけ。</p>
           {err && <p className="err">{err}</p>}
         </section>
       )}
@@ -127,6 +131,9 @@ export function App() {
         <>
           <div className="who">
             <div>
+              {pub?.displayName ? (
+                <strong className="who-name">{pub.displayName}</strong>
+              ) : null}{" "}
               {shortAddr(snap.wallet)}{" "}
               {deni ? (
                 <span
@@ -146,6 +153,18 @@ export function App() {
                   ? "義未連携（ウォレットを Discord でリンク） · Rank は義を増やさない"
                   : "義を読み込み中 / 未接続 · Rank は義を増やさない"}
             </div>
+            {pub?.roles && pub.roles.length > 0 ? (
+              <div className="roles">
+                {pub.roles.slice(0, 8).map((r) => (
+                  <span key={r} className="role-chip">
+                    {r}
+                  </span>
+                ))}
+                {pub.roles.length > 8 ? (
+                  <span className="role-chip more">+{pub.roles.length - 8}</span>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <div className="grid">

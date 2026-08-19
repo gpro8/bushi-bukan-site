@@ -242,10 +242,17 @@ export type EventSnap = {
   sukedachi_test?: { lit: boolean; tier: number };
 };
 
+export type PublicDiscord = {
+  displayName: string | null;
+  username: string | null;
+  roles: string[] | null;
+};
+
 export async function loadGi(wallet: string): Promise<{
   linked: boolean;
   gi: GiSnap | null;
   events: EventSnap | null;
+  discord: PublicDiscord | null;
 }> {
   try {
     const res = await fetch(
@@ -257,15 +264,24 @@ export async function loadGi(wallet: string): Promise<{
       linked?: boolean;
       gi?: GiSnap | null;
       events?: EventSnap | null;
+      discord?: PublicDiscord & { userId?: string | null };
     };
-    if (!data?.ok) return { linked: false, gi: null, events: null };
+    if (!data?.ok) return { linked: false, gi: null, events: null, discord: null };
+    const d = data.discord;
     return {
       linked: Boolean(data.linked),
       gi: data.gi ?? null,
       events: data.events ?? null,
+      discord: d
+        ? {
+            displayName: d.displayName || null,
+            username: d.username || null,
+            roles: Array.isArray(d.roles) ? d.roles : null,
+          }
+        : null,
     };
   } catch {
-    return { linked: false, gi: null, events: null };
+    return { linked: false, gi: null, events: null, discord: null };
   }
 }
 

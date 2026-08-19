@@ -77,7 +77,13 @@ export default {
         return json({ ok: false, error: "upstream_bad" }, 502, env, request);
       }
       if (data && typeof data === "object") {
-        if (data.discord) data.discord = { username: null, userId: null };
+        const d = data.discord && typeof data.discord === "object" ? data.discord : {};
+        data.discord = {
+          displayName: d.displayName || null,
+          username: d.username || null,
+          roles: Array.isArray(d.roles) ? d.roles.slice(0, 24) : null,
+          userId: null,
+        };
         delete data.displayName;
         delete data.username;
         delete data.userId;

@@ -86,6 +86,25 @@ body {
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
+.who-name {
+  margin-right: 0.25rem;
+}
+.roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.4rem;
+}
+.role-chip {
+  font-size: 0.68rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.role-chip.more {
+  border-style: dashed;
+}
 .pill {
   padding: 0.12rem 0.5rem;
   border-radius: 4px;

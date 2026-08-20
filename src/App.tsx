@@ -16,8 +16,7 @@ import {
   type PublicDiscord,
   type SukeSnap,
 } from "./chain";
-import { collectBadges } from "./badges";
-import { KamonMark } from "./kamon";
+import { EmblemShelf } from "./EmblemShelf";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -219,22 +218,7 @@ export function App() {
             </div>
           </div>
 
-          <div className="shelf">
-            <h2>所持家紋</h2>
-            <div className="mons">
-              {collectBadges(snap, suke, events).map((b) => (
-                <div
-                  key={b.id}
-                  className={b.lit ? "mon" : "mon off"}
-                  title={b.hint}
-                  style={b.lit && b.tint ? { color: b.tint } : undefined}
-                >
-                  <KamonMark motif={b.motif} />
-                  <span>{b.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <EmblemShelf snap={snap} suke={suke} events={events} />
 
           {key &&
             (key.href ? (

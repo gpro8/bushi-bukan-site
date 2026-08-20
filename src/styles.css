@@ -179,27 +179,32 @@ h2 {
   background: var(--panel);
   border: 1px solid var(--line);
 }
+.shelf-meta {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: -0.15rem 0 0.35rem;
+}
 .mons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem 0.7rem;
-  margin: 0.5rem 0;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.2rem;
 }
 .mon {
-  width: 72px;
-  text-align: center;
-  font-size: 0.62rem;
-  color: var(--muted);
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 50%;
 }
 .mon-svg {
   display: block;
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 0.28rem;
+  width: 64px;
+  height: 64px;
   color: inherit;
-}
-.mon:not(.off) {
-  color: var(--ink);
 }
 .mon.off {
   color: var(--muted);
@@ -208,9 +213,45 @@ h2 {
   opacity: 0.22;
   filter: grayscale(1);
 }
-.mon span {
-  display: block;
-  line-height: 1.25;
+.mon.on {
+  box-shadow: 0 0 0 2px var(--cta);
+}
+.mon.more {
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed var(--line);
+  color: var(--muted);
+}
+.more-n {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.shelf-fold {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.15rem 0 0.4rem;
+}
+.mon-card {
+  margin-top: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--hold);
+}
+.mon-card p {
+  margin-top: 0.25rem;
+  font-size: 0.88rem;
+}
+.mon-state {
+  margin-left: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.shelf-invite {
+  margin-top: 0.45rem;
 }
 .cta {
   display: block;

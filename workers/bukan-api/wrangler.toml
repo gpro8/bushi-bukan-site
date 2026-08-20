@@ -7,3 +7,7 @@ workers_dev = true
 
 [vars]
 ALLOWED_ORIGINS = "https://gpro8.github.io,http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173"
+
+[[kv_namespaces]]
+binding = "BUKAN_GI"
+id = "87289c0ee37a43299819c4edf766aab7"

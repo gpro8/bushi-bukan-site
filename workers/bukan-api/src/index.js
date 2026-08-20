@@ -1,13 +1,18 @@
 /**
  * Public 武鑑 Gi proxy.
  * GET /health
- * GET /v1/bukan?wallet=0x…  → local bot API (BUKAN_UPSTREAM + BUKAN_API_KEY)
+ * GET /v1/bukan?wallet=0x…  → live Mac API, else KV replica
+ *
+ * Replica is written from the Mac via `wrangler kv key put` (no public write).
  *
  * 旗手/加勢/義援 are read in the browser from the public Sukedachi Worker
  * (Workers cannot fetch other *.workers.dev — CF 1042).
  *
- * Never returns Discord username / user_id.
+ * Never returns Discord user_id.
  */
+
+const SNAP_KEY = "snapshot";
+
 function corsHeaders(env, request) {
   const origin = request.headers.get("Origin") || "";
   const allowed = (env.ALLOWED_ORIGINS || "")
@@ -41,6 +46,53 @@ function normWallet(raw) {
   return w.toLowerCase();
 }
 
+function stripIdentity(data) {
+  if (!data || typeof data !== "object") return data;
+  const d = data.discord && typeof data.discord === "object" ? data.discord : {};
+  data.discord = {
+    displayName: d.displayName || null,
+    username: d.username || null,
+    roles: Array.isArray(d.roles) ? d.roles.slice(0, 24) : null,
+    userId: null,
+  };
+  delete data.displayName;
+  delete data.username;
+  delete data.userId;
+  delete data.user_id;
+  return data;
+}
+
+async function fromKv(env, wallet) {
+  if (!env.BUKAN_GI) return null;
+  const raw = await env.BUKAN_GI.get(SNAP_KEY);
+  if (!raw) return null;
+  let snap;
+  try {
+    snap = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  const items = Array.isArray(snap.items) ? snap.items : [];
+  const hit = items.find((it) => it && String(it.wallet || "").toLowerCase() === wallet);
+  if (!hit) {
+    return {
+      ok: true,
+      version: 1,
+      wallet,
+      linked: false,
+      gi: null,
+      events: null,
+      discord: { displayName: null, username: null, roles: null, userId: null },
+      source: "kv",
+      asOf: snap.asOf || null,
+    };
+  }
+  const data = stripIdentity({ ...hit });
+  data.source = "kv";
+  data.asOf = snap.asOf || null;
+  return data;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -49,12 +101,18 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/health" || url.pathname === "/") {
       return json(
-        { ok: true, service: "bushi-bukan-api", upstream: Boolean(env.BUKAN_UPSTREAM) },
+        {
+          ok: true,
+          service: "bushi-bukan-api",
+          upstream: Boolean(env.BUKAN_UPSTREAM),
+          kv: Boolean(env.BUKAN_GI),
+        },
         200,
         env,
         request
       );
     }
+
     if (request.method !== "GET" || url.pathname !== "/v1/bukan") {
       return json({ ok: false, error: "not_found" }, 404, env, request);
     }
@@ -62,41 +120,30 @@ export default {
     if (!wallet) return json({ ok: false, error: "bad_wallet" }, 400, env, request);
 
     const upstream = (env.BUKAN_UPSTREAM || "").replace(/\/$/, "");
-    if (!upstream) {
-      return json({ ok: false, error: "upstream_unset" }, 503, env, request);
-    }
-    const headers = { Accept: "application/json" };
-    if (env.BUKAN_API_KEY) headers["X-Bukan-Key"] = env.BUKAN_API_KEY;
-    try {
-      const res = await fetch(`${upstream}/v1/bukan?wallet=${wallet}`, { headers });
-      const text = await res.text();
-      let data;
+    if (upstream) {
+      const headers = { Accept: "application/json" };
+      if (env.BUKAN_API_KEY) headers["X-Bukan-Key"] = env.BUKAN_API_KEY;
       try {
-        data = JSON.parse(text);
+        const res = await fetch(`${upstream}/v1/bukan?wallet=${wallet}`, { headers });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = null;
+        }
+        if (data && typeof data === "object" && data.ok !== false) {
+          stripIdentity(data);
+          data.source = "live";
+          return json(data, res.status, env, request);
+        }
       } catch {
-        return json({ ok: false, error: "upstream_bad" }, 502, env, request);
+        /* fall through to KV */
       }
-      if (data && typeof data === "object") {
-        const d = data.discord && typeof data.discord === "object" ? data.discord : {};
-        data.discord = {
-          displayName: d.displayName || null,
-          username: d.username || null,
-          roles: Array.isArray(d.roles) ? d.roles.slice(0, 24) : null,
-          userId: null,
-        };
-        delete data.displayName;
-        delete data.username;
-        delete data.userId;
-        delete data.user_id;
-      }
-      return json(data, res.status, env, request);
-    } catch (e) {
-      return json(
-        { ok: false, error: "upstream_down", detail: String(e).slice(0, 80) },
-        502,
-        env,
-        request
-      );
     }
+
+    const replica = await fromKv(env, wallet);
+    if (replica) return json(replica, 200, env, request);
+    return json({ ok: false, error: "upstream_down", source: "none" }, 502, env, request);
   },
 };

@@ -17,6 +17,7 @@ import {
   type SukeSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
+import { HeroStub } from "./HeroStub";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -129,42 +130,45 @@ export function App() {
 
       {snap && (
         <>
-          <div className="who">
-            <div>
-              {pub?.displayName ? (
-                <strong className="who-name">{pub.displayName}</strong>
-              ) : null}{" "}
-              {shortAddr(snap.wallet)}{" "}
-              {deni ? (
-                <span
-                  className="pill"
-                  style={{ background: deni.hex, color: deni.ink }}
-                >
-                  {deni.ja} {deni.code}
-                </span>
-              ) : (
-                <span className="pill empty">伝位なし</span>
-              )}
-            </div>
-            <div className="sub">
-              {gi
-                ? `位階 #${gi.rank} / ${gi.cohort} · 直近7日 +${gi.recent7d} · Rank は義を増やさない`
-                : giLinked === false
-                  ? "義未連携（ウォレットを Discord でリンク） · Rank は義を増やさない"
-                  : "義を読み込み中 / 未接続 · Rank は義を増やさない"}
-            </div>
-            {pub?.roles && pub.roles.length > 0 ? (
-              <div className="roles">
-                {pub.roles.slice(0, 8).map((r) => (
-                  <span key={r} className="role-chip">
-                    {r}
+          <div className="stage">
+            <div className="who">
+              <div>
+                {pub?.displayName ? (
+                  <strong className="who-name">{pub.displayName}</strong>
+                ) : null}{" "}
+                {shortAddr(snap.wallet)}{" "}
+                {deni ? (
+                  <span
+                    className="pill"
+                    style={{ background: deni.hex, color: deni.ink }}
+                  >
+                    {deni.ja} {deni.code}
                   </span>
-                ))}
-                {pub.roles.length > 8 ? (
-                  <span className="role-chip more">+{pub.roles.length - 8}</span>
-                ) : null}
+                ) : (
+                  <span className="pill empty">伝位なし</span>
+                )}
               </div>
-            ) : null}
+              <div className="sub">
+                {gi
+                  ? `位階 #${gi.rank} / ${gi.cohort} · 直近7日 +${gi.recent7d} · Rank は義を増やさない`
+                  : giLinked === false
+                    ? "義未連携（ウォレットを Discord でリンク） · Rank は義を増やさない"
+                    : "義を読み込み中 / 未接続 · Rank は義を増やさない"}
+              </div>
+              {pub?.roles && pub.roles.length > 0 ? (
+                <div className="roles">
+                  {pub.roles.slice(0, 8).map((r) => (
+                    <span key={r} className="role-chip">
+                      {r}
+                    </span>
+                  ))}
+                  {pub.roles.length > 8 ? (
+                    <span className="role-chip more">+{pub.roles.length - 8}</span>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+            <HeroStub snap={snap} />
           </div>
 
           <div className="grid">

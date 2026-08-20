@@ -76,10 +76,95 @@ body {
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
-.who {
+.stage {
   max-width: 960px;
   margin: 0 auto;
-  padding: 1rem 1.1rem 0.4rem;
+  display: grid;
+  gap: 0;
+}
+@media (min-width: 760px) {
+  .stage {
+    grid-template-columns: 1fr 1.05fr;
+    align-items: stretch;
+    min-height: 280px;
+  }
+}
+.who {
+  padding: 1.1rem 1.15rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.hero {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 70% 35%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
+  border-bottom: 1px solid var(--line);
+}
+html[data-theme="dark"] .hero {
+  background:
+    radial-gradient(120% 90% at 70% 35%, #2c261e 0%, #1f1c18 60%, #141210 100%);
+}
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      color-mix(in srgb, var(--ink) 6%, transparent) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      color-mix(in srgb, var(--ink) 4%, transparent) 4px
+    );
+}
+.hero-mark {
+  position: absolute;
+  right: 8%;
+  top: 50%;
+  width: 168px;
+  height: 168px;
+  transform: translateY(-58%);
+  opacity: 0.14;
+  color: var(--ink);
+}
+.hero-mark .mon-svg {
+  width: 168px;
+  height: 168px;
+}
+.hero-void {
+  position: absolute;
+  right: 14%;
+  top: 42%;
+  width: 120px;
+  height: 120px;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+.hero-copy {
+  position: absolute;
+  left: 1.1rem;
+  bottom: 0.85rem;
+  max-width: 16rem;
+  color: var(--ink);
+}
+.hero-copy strong {
+  font-size: 0.92rem;
+}
+.hero-copy p {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--muted);
 }
 .sub {
   opacity: 0.75;

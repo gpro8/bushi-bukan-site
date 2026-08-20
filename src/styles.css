@@ -78,37 +78,17 @@ body {
 }
 .stage {
   position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  min-height: 300px;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 90% at 72% 32%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
-  border-bottom: 1px solid var(--line);
-}
-html[data-theme="dark"] .stage {
-  background:
-    radial-gradient(120% 90% at 72% 32%, #2c261e 0%, #1f1c18 60%, #141210 100%);
-}
-.who {
-  position: relative;
-  z-index: 1;
   max-width: 960px;
   margin: 0 auto;
-  min-height: 300px;
-  padding: 1.2rem 1.15rem 1.35rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-.hero {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
+  display: grid;
   overflow: hidden;
-  pointer-events: none;
+  min-height: 260px;
+  background:
+    radial-gradient(120% 90% at 72% 32%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
+  border: 1px solid var(--line);
 }
-.hero-grain {
+.stage::before {
+  content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -127,14 +107,37 @@ html[data-theme="dark"] .stage {
       color-mix(in srgb, var(--ink) 4%, transparent) 4px
     );
 }
+html[data-theme="dark"] .stage {
+  background:
+    radial-gradient(120% 90% at 72% 32%, #2c261e 0%, #1f1c18 60%, #141210 100%);
+}
+@media (min-width: 760px) {
+  .stage {
+    grid-template-columns: 1fr 1.05fr;
+    align-items: stretch;
+  }
+}
+.who {
+  position: relative;
+  z-index: 1;
+  padding: 1.15rem 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.hero {
+  position: relative;
+  min-height: 200px;
+  overflow: hidden;
+}
 .hero-mark {
   position: absolute;
-  right: 8%;
+  left: 50%;
   top: 50%;
   width: 168px;
   height: 168px;
-  transform: translateY(-58%);
-  opacity: 0.14;
+  transform: translate(-50%, -52%);
+  opacity: 0.16;
   color: var(--ink);
 }
 .hero-mark .mon-svg {
@@ -143,21 +146,18 @@ html[data-theme="dark"] .stage {
 }
 .hero-void {
   position: absolute;
-  right: 14%;
-  top: 42%;
+  left: 50%;
+  top: 50%;
   width: 120px;
   height: 120px;
   border: 1.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
   border-radius: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
 }
 .hero-copy {
-  position: absolute;
-  right: 1.15rem;
-  bottom: 0.85rem;
-  left: auto;
-  max-width: 16rem;
-  text-align: right;
+  position: relative;
+  margin-top: 0.85rem;
+  max-width: 18rem;
   color: var(--ink);
 }
 .hero-copy strong {

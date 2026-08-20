@@ -12,12 +12,25 @@ function watermarkOf(snap: ChainSnap): Motif | null {
   return null;
 }
 
-export function HeroStub({ snap }: { snap: ChainSnap }) {
+export function HeroCopy({ snap }: { snap: ChainSnap }) {
   const deni = deniOf(snap.rank);
+  return (
+    <div className="hero-copy">
+      <strong>空の和紙</strong>
+      <p>
+        {deni
+          ? `${deni.ja}の家紋を透かしています。蔵が開いたら、ここに顔が立ちます。`
+          : "Bushi Collection のあと、所持から顔を選べます。今は空です。"}
+      </p>
+    </div>
+  );
+}
+
+/** Right column only — no text. Future Collection face lives here. */
+export function HeroStub({ snap }: { snap: ChainSnap }) {
   const motif = watermarkOf(snap);
   return (
     <div className="hero" aria-hidden="true">
-      <div className="hero-grain" />
       {motif ? (
         <div className="hero-mark">
           <KamonMark motif={motif} />
@@ -25,14 +38,6 @@ export function HeroStub({ snap }: { snap: ChainSnap }) {
       ) : (
         <div className="hero-void" />
       )}
-      <div className="hero-copy">
-        <strong>空の和紙</strong>
-        <p>
-          {deni
-            ? `${deni.ja}の家紋を透かしています。蔵が開いたら、ここに顔が立ちます。`
-            : "Bushi Collection のあと、所持から顔を選べます。今は空です。"}
-        </p>
-      </div>
     </div>
   );
 }

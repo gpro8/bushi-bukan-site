@@ -17,7 +17,7 @@ import {
   type SukeSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
-import { HeroStub } from "./HeroStub";
+import { HeroCopy, HeroStub } from "./HeroStub";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -131,7 +131,6 @@ export function App() {
       {snap && (
         <>
           <div className="stage">
-            <HeroStub snap={snap} />
             <div className="who">
               <div>
                 {pub?.displayName ? (
@@ -168,7 +167,9 @@ export function App() {
                   ) : null}
                 </div>
               ) : null}
+              <HeroCopy snap={snap} />
             </div>
+            <HeroStub snap={snap} />
           </div>
 
           <div className="grid">

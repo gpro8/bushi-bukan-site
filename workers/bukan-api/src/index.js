@@ -106,6 +106,7 @@ export default {
           service: "bushi-bukan-api",
           upstream: Boolean(env.BUKAN_UPSTREAM),
           kv: Boolean(env.BUKAN_GI),
+          vpc: Boolean(env.BUKAN_VPC),
         },
         200,
         env,
@@ -119,27 +120,43 @@ export default {
     const wallet = normWallet(url.searchParams.get("wallet") || url.searchParams.get("address"));
     if (!wallet) return json({ ok: false, error: "bad_wallet" }, 400, env, request);
 
-    const upstream = (env.BUKAN_UPSTREAM || "").replace(/\/$/, "");
-    if (upstream) {
-      const headers = { Accept: "application/json" };
-      if (env.BUKAN_API_KEY) headers["X-Bukan-Key"] = env.BUKAN_API_KEY;
+    const headers = { Accept: "application/json" };
+    if (env.BUKAN_API_KEY) headers["X-Bukan-Key"] = env.BUKAN_API_KEY;
+    const path = `/v1/bukan?wallet=${wallet}`;
+
+    async function tryFetch(label, promise) {
       try {
-        const res = await fetch(`${upstream}/v1/bukan?wallet=${wallet}`, { headers });
+        const res = await promise;
         const text = await res.text();
         let data;
         try {
           data = JSON.parse(text);
         } catch {
-          data = null;
+          return null;
         }
         if (data && typeof data === "object" && data.ok !== false) {
           stripIdentity(data);
-          data.source = "live";
+          data.source = label;
           return json(data, res.status, env, request);
         }
       } catch {
-        /* fall through to KV */
+        return null;
       }
+      return null;
+    }
+
+    if (env.BUKAN_VPC) {
+      const hit = await tryFetch(
+        "vpc",
+        env.BUKAN_VPC.fetch(`http://127.0.0.1:8788${path}`, { headers })
+      );
+      if (hit) return hit;
+    }
+
+    const upstream = (env.BUKAN_UPSTREAM || "").replace(/\/$/, "");
+    if (upstream) {
+      const hit = await tryFetch("live", fetch(`${upstream}${path}`, { headers }));
+      if (hit) return hit;
     }
 
     const replica = await fromKv(env, wallet);

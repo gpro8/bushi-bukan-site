@@ -11,3 +11,7 @@ ALLOWED_ORIGINS = "https://gpro8.github.io,http://localhost:5173,http://127.0.0.
 [[kv_namespaces]]
 binding = "BUKAN_GI"
 id = "87289c0ee37a43299819c4edf766aab7"
+
+[[vpc_services]]
+binding = "BUKAN_VPC"
+service_id = "01a01f3b-2b8d-7143-af29-71c374d2d893"

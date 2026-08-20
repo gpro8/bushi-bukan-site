@@ -17,6 +17,7 @@ import {
   type SukeSnap,
 } from "./chain";
 import { collectBadges } from "./badges";
+import { KamonMark } from "./kamon";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -222,9 +223,14 @@ export function App() {
             <h2>所持家紋</h2>
             <div className="mons">
               {collectBadges(snap, suke, events).map((b) => (
-                <div key={b.id} className={b.lit ? "mon" : "mon off"}>
-                  <i>{b.glyph}</i>
-                  {b.label}
+                <div
+                  key={b.id}
+                  className={b.lit ? "mon" : "mon off"}
+                  title={b.hint}
+                  style={b.lit && b.tint ? { color: b.tint } : undefined}
+                >
+                  <KamonMark motif={b.motif} />
+                  <span>{b.label}</span>
                 </div>
               ))}
             </div>

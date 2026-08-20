@@ -253,6 +253,8 @@ export async function loadGi(wallet: string): Promise<{
   gi: GiSnap | null;
   events: EventSnap | null;
   discord: PublicDiscord | null;
+  primary: string | null;
+  aliases: string[];
 }> {
   try {
     const res = await fetch(
@@ -264,14 +266,20 @@ export async function loadGi(wallet: string): Promise<{
       linked?: boolean;
       gi?: GiSnap | null;
       events?: EventSnap | null;
+      primary?: string | null;
+      aliases?: string[];
       discord?: PublicDiscord & { userId?: string | null };
     };
-    if (!data?.ok) return { linked: false, gi: null, events: null, discord: null };
+    if (!data?.ok) {
+      return { linked: false, gi: null, events: null, discord: null, primary: null, aliases: [] };
+    }
     const d = data.discord;
     return {
       linked: Boolean(data.linked),
       gi: data.gi ?? null,
       events: data.events ?? null,
+      primary: data.primary || null,
+      aliases: Array.isArray(data.aliases) ? data.aliases : [],
       discord: d
         ? {
             displayName: d.displayName || null,
@@ -281,7 +289,7 @@ export async function loadGi(wallet: string): Promise<{
         : null,
     };
   } catch {
-    return { linked: false, gi: null, events: null, discord: null };
+    return { linked: false, gi: null, events: null, discord: null, primary: null, aliases: [] };
   }
 }
 

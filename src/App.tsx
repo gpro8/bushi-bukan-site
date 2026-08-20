@@ -38,6 +38,8 @@ export function App() {
   const [events, setEvents] = useState<EventSnap | null>(null);
   const [pub, setPub] = useState<PublicDiscord | null>(null);
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
+  const [aliases, setAliases] = useState<string[]>([]);
+  const [primary, setPrimary] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -49,6 +51,8 @@ export function App() {
     setEvents(null);
     setPub(null);
     setGiLinked(null);
+    setAliases([]);
+    setPrimary(null);
     try {
       const s = await loadSnap(raw);
       setSnap(s);
@@ -59,6 +63,8 @@ export function App() {
       setGiLinked(g.linked);
       setEvents(g.events);
       setPub(g.discord);
+      setPrimary(g.primary);
+      setAliases(g.aliases);
       const sk = await loadSuke(s.wallet);
       setSuke(sk);
     } catch (e) {
@@ -155,6 +161,14 @@ export function App() {
                     ? "義未連携（ウォレットを Discord でリンク） · Rank は義を増やさない"
                     : "義を読み込み中 / 未接続 · Rank は義を増やさない"}
               </div>
+              {aliases.length > 0 ? (
+                <div className="aliases">
+                  {primary ? <span>主 {shortAddr(primary)}</span> : null}
+                  {aliases.map((a) => (
+                    <span key={a}>別名 {shortAddr(a)}</span>
+                  ))}
+                </div>
+              ) : null}
               {pub?.roles && pub.roles.length > 0 ? (
                 <div className="roles">
                   {pub.roles.slice(0, 8).map((r) => (

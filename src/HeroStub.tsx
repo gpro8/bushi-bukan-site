@@ -16,7 +16,7 @@ export function HeroStub({ snap }: { snap: ChainSnap }) {
   const deni = deniOf(snap.rank);
   const motif = watermarkOf(snap);
   return (
-    <aside className="hero" aria-label="顔の場">
+    <div className="hero" aria-hidden="true">
       <div className="hero-grain" />
       {motif ? (
         <div className="hero-mark">
@@ -33,6 +33,6 @@ export function HeroStub({ snap }: { snap: ChainSnap }) {
             : "Bushi Collection のあと、所持から顔を選べます。今は空です。"}
         </p>
       </div>
-    </aside>
+    </div>
   );
 }

@@ -131,6 +131,7 @@ export function App() {
       {snap && (
         <>
           <div className="stage">
+            <HeroStub snap={snap} />
             <div className="who">
               <div>
                 {pub?.displayName ? (
@@ -168,7 +169,6 @@ export function App() {
                 </div>
               ) : null}
             </div>
-            <HeroStub snap={snap} />
           </div>
 
           <div className="grid">

@@ -312,6 +312,12 @@ h2 {
 .mon.on {
   box-shadow: 0 0 0 2px var(--cta);
 }
+/* 陰: 樺色家紋と --cta が同系で輪郭が消える → 山吹（貢献層より明度を上げる） */
+html[data-theme="dark"] .mon.on {
+  box-shadow:
+    0 0 0 2px #f8b500,
+    0 0 0 4px color-mix(in srgb, #f8b500 28%, transparent);
+}
 .mon.more {
   display: grid;
   place-items: center;

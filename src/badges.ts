@@ -1,6 +1,6 @@
 /** Badge registry — add a row, don't fork App.tsx. */
 
-import { DENI, type ChainSnap, type EventSnap, type SukeSnap } from "./chain";
+import { DENI, type ChainSnap, type EventSnap, type SukeSnap, type TestSnap } from "./chain";
 import type { Motif } from "./kamon";
 
 export type Badge = {
@@ -19,7 +19,8 @@ const EXAM_MOTIF: Motif[] = ["ume", "ya", "kiku", "tomoe", "kiri", "rinpo"];
 export function collectBadges(
   snap: ChainSnap,
   suke: SukeSnap | null,
-  events: EventSnap | null
+  events: EventSnap | null,
+  test: TestSnap | null = null
 ): Badge[] {
   const out: Badge[] = [];
   for (const d of DENI) {
@@ -96,6 +97,33 @@ export function collectBadges(
     hint: "BOと遊BO に参加すると点灯",
     lit: Boolean(events?.asobi?.lit),
     tint: "#cd5e3c",
+    adapter: "offchain",
+  });
+  out.push({
+    id: "exam-sepolia",
+    family: "testnet",
+    motif: "ume",
+    label: "試験・検定",
+    hint: "Base Sepolia の ExamPass を持つと点灯（本番の伝位にはならない）",
+    lit: Boolean(test?.exam),
+    adapter: "onchain",
+  });
+  out.push({
+    id: "rank-sepolia",
+    family: "testnet",
+    motif: "tomoe",
+    label: "試験・伝位",
+    hint: "Base Sepolia の Rank SBT を持つと点灯（本番の伝位にはならない）",
+    lit: Boolean(test?.rank),
+    adapter: "onchain",
+  });
+  out.push({
+    id: "auction",
+    family: "auction",
+    motif: "kiri",
+    label: "出陣",
+    hint: "Bushi Collection 競売に参加すると点灯（第一ロット後）",
+    lit: false,
     adapter: "offchain",
   });
   return out;

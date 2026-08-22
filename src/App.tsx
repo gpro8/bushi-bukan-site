@@ -5,6 +5,7 @@ import {
   loadGi,
   loadSnap,
   loadSuke,
+  loadTestSnap,
   nextKeyFromChain,
   parseWalletParam,
   setWalletParam,
@@ -15,6 +16,7 @@ import {
   type NextKey,
   type PublicDiscord,
   type SukeSnap,
+  type TestSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
 import { HeroCopy, HeroStub } from "./HeroStub";
@@ -36,6 +38,7 @@ export function App() {
   const [gi, setGi] = useState<GiSnap | null>(null);
   const [suke, setSuke] = useState<SukeSnap | null>(null);
   const [events, setEvents] = useState<EventSnap | null>(null);
+  const [test, setTest] = useState<TestSnap | null>(null);
   const [pub, setPub] = useState<PublicDiscord | null>(null);
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [aliases, setAliases] = useState<string[]>([]);
@@ -49,6 +52,7 @@ export function App() {
     setGi(null);
     setSuke(null);
     setEvents(null);
+    setTest(null);
     setPub(null);
     setGiLinked(null);
     setAliases([]);
@@ -65,6 +69,10 @@ export function App() {
       setPub(g.discord);
       setPrimary(g.primary);
       setAliases(g.aliases);
+      const testWallets = [s.wallet, g.primary, ...(g.aliases || [])].filter(
+        Boolean
+      ) as string[];
+      setTest(await loadTestSnap(testWallets));
       const sk = await loadSuke(s.wallet);
       setSuke(sk);
     } catch (e) {
@@ -237,7 +245,7 @@ export function App() {
             </div>
           </div>
 
-          <EmblemShelf snap={snap} suke={suke} events={events} />
+          <EmblemShelf snap={snap} suke={suke} events={events} test={test} />
 
           {key &&
             (key.href ? (

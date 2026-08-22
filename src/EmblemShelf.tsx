@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { collectBadges, type Badge } from "./badges";
 import { KamonMark } from "./kamon";
-import type { ChainSnap, EventSnap, SukeSnap } from "./chain";
+import type { ChainSnap, EventSnap, SukeSnap, TestSnap } from "./chain";
 
 const VISIBLE = 8;
 
@@ -9,14 +9,16 @@ export function EmblemShelf({
   snap,
   suke,
   events,
+  test,
 }: {
   snap: ChainSnap;
   suke: SukeSnap | null;
   events: EventSnap | null;
+  test: TestSnap | null;
 }) {
   const badges = useMemo(
-    () => collectBadges(snap, suke, events),
-    [snap, suke, events]
+    () => collectBadges(snap, suke, events, test),
+    [snap, suke, events, test]
   );
   const ordered = useMemo(() => {
     const lit = badges.filter((b) => b.lit);

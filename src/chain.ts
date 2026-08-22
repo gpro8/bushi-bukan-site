@@ -6,10 +6,16 @@ import {
   getAddress,
   type Address,
 } from "viem";
-import { base } from "viem/chains";
+import { base, baseSepolia } from "viem/chains";
 
 export const EXAM = "0x58cf52F88a537F2343c8Da74760a03022E5Bd887" as Address;
 export const RANK = "0xCb454D0Da9536cC8CA01CF2B1B3D441fb25b4eaa" as Address;
+
+/** Legacy Base Sepolia soak — honor 家紋 only; never 伝位 / never migrate. */
+export const EXAM_SEPOLIA =
+  "0x05EcA5254B7804565317bc95D11d778C45d469F4" as Address;
+export const RANK_SEPOLIA =
+  "0x52bb0Af783ADE927322193488a8869066EAdd94D" as Address;
 
 export const EXAM_URL = "https://giuliav6-ai.github.io/web3-kentei/";
 export const SUKEDACHI_URL = "https://gpro8.github.io/sukedachi-site/";
@@ -23,6 +29,16 @@ const RPCS = [
 export const client = createPublicClient({
   chain: base,
   transport: fallback(RPCS.map((url) => http(url, { timeout: 12_000 }))),
+});
+
+const sepoliaClient = createPublicClient({
+  chain: baseSepolia,
+  transport: fallback(
+    [
+      "https://sepolia.base.org",
+      "https://base-sepolia.publicnode.com",
+    ].map((url) => http(url, { timeout: 12_000 }))
+  ),
 });
 
 export const DENI = [
@@ -118,6 +134,48 @@ export async function loadSnap(raw: string): Promise<ChainSnap> {
     };
   } catch (e) {
     throw new Error(friendlyRpcError(e));
+  }
+}
+
+export type TestSnap = { exam: boolean; rank: boolean };
+
+/** Sepolia soak SBTs. Honor only. Soft-fail → both unlit. */
+export async function loadTestSnap(wallets: string[]): Promise<TestSnap> {
+  const addrs: Address[] = [];
+  for (const raw of wallets) {
+    if (!raw || !isAddress(raw)) continue;
+    const a = getAddress(raw);
+    if (!addrs.includes(a)) addrs.push(a);
+  }
+  if (!addrs.length) return { exam: false, rank: false };
+  try {
+    let exam = false;
+    let rank = false;
+    for (const wallet of addrs) {
+      const r = await sepoliaClient.readContract({
+        address: RANK_SEPOLIA,
+        abi: RANK_ABI,
+        functionName: "currentRank",
+        args: [wallet],
+      });
+      if (Number(r) > 0) rank = true;
+      const flags = await sepoliaClient.multicall({
+        allowFailure: true,
+        contracts: DENI.map((d) => ({
+          address: EXAM_SEPOLIA,
+          abi: EXAM_ABI,
+          functionName: "hasExamPass" as const,
+          args: [wallet, d.tier] as const,
+        })),
+      });
+      if (flags.some((f) => f.status === "success" && Boolean(f.result))) {
+        exam = true;
+      }
+      if (exam && rank) break;
+    }
+    return { exam, rank };
+  } catch {
+    return { exam: false, rank: false };
   }
 }
 

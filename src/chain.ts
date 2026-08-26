@@ -241,38 +241,30 @@ export async function loadSuke(wallet: string): Promise<SukeSnap | null> {
     };
     const list = camps.campaigns || [];
     let started = 0;
+    for (const c of list) {
+      if ((c.creator || "").toLowerCase() === w) started += 1;
+    }
     let kaseTimes = 0;
     let kaseYen = 0;
     let gienTimes = 0;
     let gienYen = 0;
-    for (const c of list) {
-      const addr = (c.address || "").toLowerCase();
-      const creator = (c.creator || "").toLowerCase();
-      const kind = c.kind === "charity" ? "charity" : "crowdfund";
-      if (creator === w) started += 1;
-      if (!addr) continue;
-      try {
-        const cr = await fetch(
-          `${SUKE_API}/contributors?address=${addr}&kind=${kind}`
-        );
-        const cj = (await cr.json()) as {
-          rows?: { address?: string; total?: string }[];
-        };
-        const row = (cj.rows || []).find(
-          (r) => (r.address || "").toLowerCase() === w
-        );
-        if (!row) continue;
-        const y = yen18(row.total || "0");
-        if (kind === "charity") {
+    try {
+      const mineRes = await fetch(`${SUKE_API}/contributions?donor=${w}`);
+      const mine = (await mineRes.json()) as {
+        rows?: { kind?: string; amount?: string }[];
+      };
+      for (const r of mine.rows || []) {
+        const y = yen18(r.amount || "0");
+        if (r.kind === "charity") {
           gienTimes += 1;
           gienYen += y;
         } else {
           kaseTimes += 1;
           kaseYen += y;
         }
-      } catch {
-        /* skip one 旗 */
       }
+    } catch {
+      /* Path A optional */
     }
     return {
       flag: { started, tier: countTier(started), lit: started > 0 },

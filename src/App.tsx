@@ -19,7 +19,7 @@ import {
   type TestSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
-import { HeroCopy, HeroStub } from "./HeroStub";
+import { HeroStub } from "./HeroStub";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -102,7 +102,17 @@ export function App() {
   );
 
   return (
-    <>
+    <div className="night">
+      <p className="preview-note">
+        巻物プレビュー · 本番ではありません ·{" "}
+        <a href="https://gpro8.github.io/bushi-bukan-site/">いまの武鑑</a>
+      </p>
+      <aside className="hata" aria-hidden="true">
+        <span>武</span>
+        <span>鑑</span>
+      </aside>
+      <div className="scroll">
+        <div className="rail rail-top" aria-hidden="true" />
       <header className="bar">
         <strong>武鑑</strong>
         <form
@@ -135,8 +145,12 @@ export function App() {
 
       {!snap && (
         <section className="meishi">
-          <h1>武鑑</h1>
-          <p>義と伝位の名鑑。ウォレットを入れると、検定と伝位を鎖から読みます。</p>
+          <div className="washi-empty" aria-hidden="true">
+            <div className="hero-void" />
+            <p className="washi-kicker">空の和紙</p>
+          </div>
+          <h1>義と伝位の名鑑</h1>
+          <p>ウォレットを入れると、検定と伝位を鎖から読みます。</p>
           <p className="muted">義はウォレット連携済みなら同じ数字を表示します。Discord 名は本人が `/bukan_public` したときだけ。</p>
           {err && <p className="err">{err}</p>}
         </section>
@@ -145,6 +159,7 @@ export function App() {
       {snap && (
         <>
           <div className="stage">
+            <HeroStub snap={snap} />
             <div className="who">
               <div>
                 {pub?.displayName ? (
@@ -189,9 +204,7 @@ export function App() {
                   ) : null}
                 </div>
               ) : null}
-              <HeroCopy snap={snap} />
             </div>
-            <HeroStub snap={snap} />
           </div>
 
           <div className="grid">
@@ -258,6 +271,9 @@ export function App() {
           {err && <p className="err wrap">{err}</p>}
         </>
       )}
-    </>
+        <p className="colophon">記録は鎖の上にある</p>
+        <div className="rail rail-bot" aria-hidden="true" />
+      </div>
+    </div>
   );
 }

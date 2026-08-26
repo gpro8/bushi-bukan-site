@@ -4,7 +4,7 @@ import { initTheme } from "./theme";
 import { App } from "./App";
 import "./styles.css";
 
-initTheme("light");
+initTheme("dark");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

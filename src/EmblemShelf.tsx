@@ -42,18 +42,20 @@ export function EmblemShelf({
       </p>
       <div className="mons" role="list">
         {shown.map((b) => (
-          <button
-            key={b.id}
-            type="button"
-            role="listitem"
-            className={`mon${b.lit ? "" : " off"}${sel === b.id ? " on" : ""}`}
-            style={b.lit && b.tint ? { color: b.tint } : undefined}
-            aria-pressed={sel === b.id}
-            aria-label={`${b.label} · ${b.lit ? "点灯" : "未点灯"}`}
-            onClick={() => pick(b)}
-          >
-            <KamonMark motif={b.motif} />
-          </button>
+          <div key={b.id} className="mon-cell">
+            <button
+              type="button"
+              role="listitem"
+              className={`mon${b.lit ? "" : " off"}${sel === b.id ? " on" : ""}`}
+              style={b.lit && b.tint ? { color: b.tint } : undefined}
+              aria-pressed={sel === b.id}
+              aria-label={`${b.label} · ${b.lit ? "点灯" : "未点灯"}`}
+              onClick={() => pick(b)}
+            >
+              <KamonMark motif={b.motif} />
+            </button>
+            <span className="mon-cap">{b.label.split("・")[0]}</span>
+          </div>
         ))}
         {!open && extra > 0 ? (
           <button

@@ -30,14 +30,17 @@ export function HeroCopy({ snap }: { snap: ChainSnap }) {
 export function HeroStub({ snap }: { snap: ChainSnap }) {
   const motif = watermarkOf(snap);
   return (
-    <div className="hero" aria-hidden="true">
-      {motif ? (
-        <div className="hero-mark">
-          <KamonMark motif={motif} />
-        </div>
-      ) : (
-        <div className="hero-void" />
-      )}
+    <div className="hero">
+      <div className="hero-art" aria-hidden="true">
+        {motif ? (
+          <div className="hero-mark">
+            <KamonMark motif={motif} />
+          </div>
+        ) : (
+          <div className="hero-void" />
+        )}
+      </div>
+      <HeroCopy snap={snap} />
     </div>
   );
 }

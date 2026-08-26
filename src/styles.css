@@ -12,16 +12,16 @@ html[data-theme="light"] {
   --err: #a33;
 }
 html[data-theme="dark"] {
-  --bg: #1b1916;
-  --panel: #252320;
-  --ink: #ede8da;
-  --muted: #a39a8c;
-  --line: #3a3630;
-  --hold: #201e1b;
-  --nav: #141210;
+  --bg: #141c2b;
+  --panel: #f7f1e4;
+  --ink: #1f3134;
+  --muted: #6c7a7f;
+  --line: #d4c9b4;
+  --hold: #efe6d4;
+  --nav: #163a56;
   --navink: #ede8da;
-  --cta: #d4785a;
-  --err: #e88;
+  --cta: #cd5e3c;
+  --err: #a33;
 }
 * {
   box-sizing: border-box;
@@ -381,4 +381,232 @@ html[data-theme="dark"] .mon.on {
   max-width: 960px;
   margin: 0 auto 1.5rem;
   padding: 0 1.1rem;
+}
+
+/* —— design/makimono: steal mobile 巻物, not the poster —— */
+.night {
+  min-height: 100vh;
+  padding: 0 0.75rem 2.5rem;
+  background:
+    radial-gradient(ellipse 90% 42% at 50% -8%, #2d4568 0%, transparent 58%),
+    radial-gradient(ellipse 36% 24% at 88% 12%, color-mix(in srgb, #f3c4c8 16%, transparent), transparent 70%),
+    var(--bg);
+}
+html[data-theme="light"] .night {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -6%, #dfe7ee 0%, transparent 55%),
+    var(--bg);
+}
+.preview-note {
+  text-align: center;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--navink) 70%, #8aa);
+  padding: 0.55rem 0.4rem 0.15rem;
+}
+html[data-theme="light"] .preview-note {
+  color: var(--muted);
+}
+.preview-note a {
+  color: #f8b500;
+}
+html[data-theme="light"] .preview-note a {
+  color: var(--nav);
+}
+.hata {
+  display: none;
+}
+@media (min-width: 880px) {
+  .hata {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: max(0.6rem, calc(50vw - 17rem - 3.2rem));
+    top: 5.5rem;
+    width: 2.1rem;
+    padding: 0.85rem 0.15rem;
+    background: #163a56;
+    color: #f3ead6;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+    font-size: 0.92rem;
+    writing-mode: horizontal-tb;
+    gap: 0.15rem;
+    border-radius: 2px 8px 8px 2px;
+    box-shadow: 2px 6px 16px rgba(0, 0, 0, 0.28);
+    z-index: 2;
+  }
+  .hata span {
+    display: block;
+    line-height: 1.15;
+  }
+}
+.scroll {
+  position: relative;
+  width: min(26.5rem, 100%);
+  margin: 0.35rem auto 0;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow:
+    0 22px 50px rgba(0, 0, 0, 0.32),
+    0 0 0 1px color-mix(in srgb, #1c4e73 18%, transparent);
+  overflow: hidden;
+}
+.rail {
+  height: 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    #163a56 0 10px,
+    #1c4e73 10px 20px
+  );
+}
+.rail-top {
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+.rail-bot {
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+.scroll .bar {
+  background: #1c4e73;
+}
+.scroll .stage,
+.scroll .grid,
+.scroll .shelf,
+.scroll .cta,
+.scroll .err.wrap {
+  max-width: none;
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
+}
+.scroll .cta {
+  width: auto;
+  margin: 0.85rem 0.85rem 0.4rem;
+  border-radius: 4px;
+}
+.scroll .meishi {
+  margin: 0 auto;
+  padding: 1rem 1.15rem 1.4rem;
+}
+.washi-empty {
+  position: relative;
+  height: 11rem;
+  margin: 0 -0.2rem 1rem;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 50% 40%, #fffaf2 0%, #f3ead6 58%, #e4d4b6 100%);
+}
+.washi-kicker {
+  position: relative;
+  z-index: 1;
+  margin-top: 5.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+.scroll .stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 0;
+  border-right: 0;
+}
+html[data-theme="dark"] .scroll .stage {
+  background:
+    radial-gradient(120% 90% at 50% 32%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
+}
+.hero {
+  min-height: 13.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.4rem 1rem 0.85rem;
+}
+.hero-art {
+  position: absolute;
+  inset: 0;
+}
+.hero {
+  position: relative;
+}
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  margin-top: 6.4rem;
+  max-width: 16rem;
+  text-align: center;
+}
+.hero-copy strong {
+  letter-spacing: 0.16em;
+}
+.who {
+  padding-top: 0.35rem;
+}
+.scroll .grid {
+  border-top: 1px solid var(--line);
+  grid-template-columns: 1fr 1fr;
+}
+@media (min-width: 760px) {
+  .scroll .stage {
+    grid-template-columns: none;
+    display: flex;
+    flex-direction: column;
+  }
+}
+.scroll .col {
+  border-left: 0;
+  border-right: 0;
+}
+.scroll .line > i {
+  background: #1c4e73;
+}
+html[data-theme="dark"] .scroll .line > i {
+  background: #f8b500;
+}
+.scroll .shelf {
+  margin-top: 0;
+  border-left: 0;
+  border-right: 0;
+}
+.mons {
+  justify-content: space-between;
+  gap: 0.2rem 0.15rem;
+}
+.mon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  width: 3.15rem;
+}
+.mon-cap {
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.2;
+}
+.scroll .mon {
+  width: 52px;
+  height: 52px;
+}
+.scroll .mon-svg {
+  width: 52px;
+  height: 52px;
+}
+.colophon {
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  padding: 0.55rem 0 0.7rem;
+}
+html[data-theme="dark"] .scroll .mon.on {
+  box-shadow:
+    0 0 0 2px #f8b500,
+    0 0 0 4px color-mix(in srgb, #f8b500 28%, transparent);
 }

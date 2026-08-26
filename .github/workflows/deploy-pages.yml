@@ -29,6 +29,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          force_orphan: true
+          keep_files: true
+          force_orphan: false
           user_name: gpro8
           user_email: 272957896+gpro8@users.noreply.github.com

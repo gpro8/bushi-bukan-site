@@ -185,6 +185,11 @@ export const BUKAN_API =
 
 export type GiSnap = {
   total: number;
+  lifetime?: number;
+  given?: number;
+  received?: number;
+  pot?: number;
+  mintGi?: number;
   quality: number;
   participation: number;
   media: number;
@@ -194,6 +199,22 @@ export type GiSnap = {
   rank: number;
   cohort: number;
 };
+
+/** Same fallback as Discord bot giThresholds. Locked slice of いまの総義. */
+export const GI_LOCK: Record<number, number> = {
+  1: 0,
+  2: 300,
+  3: 600,
+  4: 900,
+  5: 2100,
+  6: 3000,
+};
+
+export function giSpendable(gi: GiSnap, tier: number | null | undefined): number {
+  const pot = gi.pot ?? gi.total;
+  const lock = tier && GI_LOCK[tier] != null ? GI_LOCK[tier] : 0;
+  return Math.max(0, pot - lock);
+}
 
 export type SukeFamily = {
   started?: number;

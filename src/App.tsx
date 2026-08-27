@@ -10,6 +10,7 @@ import {
   parseWalletParam,
   setWalletParam,
   shortAddr,
+  giSpendable,
   type ChainSnap,
   type EventSnap,
   type GiSnap,
@@ -200,27 +201,40 @@ export function App() {
               {gi ? (
                 <>
                   <div className="big">
-                    {gi.total} <span style={{ fontSize: "1rem" }}>義</span>
+                    {gi.pot ?? gi.total} <span style={{ fontSize: "1rem" }}>義</span>
                   </div>
+                  <p className="lane">いまの総義</p>
+                  <p className="lane">
+                    生涯 {gi.lifetime ?? gi.total} · お裾分けした {gi.given ?? 0} ·
+                    受け取った義 {gi.received ?? 0}
+                  </p>
+                  <p className="lane">
+                    使える義 {giSpendable(gi, deni?.tier ?? null)}
+                    {deni ? ` · ロック ${deni.ja}` : ""}
+                  </p>
                   <p className="lane">質 {gi.quality}</p>
                   <div className="line">
-                    <i style={{ width: `${pct(gi.quality, gi.total)}%` }} />
+                    <i style={{ width: `${pct(gi.quality, gi.lifetime ?? gi.total)}%` }} />
                   </div>
                   <p className="lane">会話 {gi.participation}</p>
                   <div className="line">
-                    <i style={{ width: `${pct(gi.participation, gi.total)}%` }} />
+                    <i
+                      style={{
+                        width: `${pct(gi.participation, gi.lifetime ?? gi.total)}%`,
+                      }}
+                    />
                   </div>
                   <p className="lane">画像 {gi.media}</p>
                   <div className="line">
-                    <i style={{ width: `${pct(gi.media, gi.total)}%` }} />
+                    <i style={{ width: `${pct(gi.media, gi.lifetime ?? gi.total)}%` }} />
                   </div>
                   <p className="lane">その他 {gi.other}</p>
                   <div className="line">
-                    <i style={{ width: `${pct(gi.other, gi.total)}%` }} />
+                    <i style={{ width: `${pct(gi.other, gi.lifetime ?? gi.total)}%` }} />
                   </div>
                   <p className="lane">ボーナス {gi.bonus}</p>
                   <div className="line">
-                    <i style={{ width: `${pct(gi.bonus, gi.total)}%` }} />
+                    <i style={{ width: `${pct(gi.bonus, gi.lifetime ?? gi.total)}%` }} />
                   </div>
                 </>
               ) : (

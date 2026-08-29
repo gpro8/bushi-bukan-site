@@ -108,9 +108,9 @@ export function App() {
         <a className="brand" href="./" aria-label="武鑑">
           <img
             className="brand-mark"
-            src={`${import.meta.env.BASE_URL}bukan-logo-figure.png`}
-            width={32}
-            height={32}
+            src={`${import.meta.env.BASE_URL}bukan-logo-ring-dark.png`}
+            width={36}
+            height={36}
             alt=""
           />
           <strong>武鑑</strong>
@@ -148,7 +148,11 @@ export function App() {
           <div className="meishi-brand">
             <img
               className="meishi-mark"
-              src={`${import.meta.env.BASE_URL}bukan-logo-figure.png`}
+              src={`${import.meta.env.BASE_URL}${
+                theme === "dark"
+                  ? "bukan-logo-ring-dark.png"
+                  : "bukan-logo-ring.png"
+              }`}
               width={120}
               height={120}
               alt=""

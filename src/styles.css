@@ -56,12 +56,10 @@ body {
   letter-spacing: 0.04em;
 }
 .brand-mark {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
   display: block;
-  /* header nav is dark in 陽 and 陰 */
-  filter: invert(1) brightness(0.96);
 }
 .lookup {
   display: flex;
@@ -99,15 +97,11 @@ body {
   margin-bottom: 0.65rem;
 }
 .meishi-mark {
-  width: 72px;
-  height: 72px;
+  width: 88px;
+  height: 88px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  /* 陽: 墨 on 鳥の子. 陰: 生成 on 暗い地 */
-}
-html[data-theme="dark"] .meishi-mark {
-  filter: invert(1) brightness(0.95);
 }
 .meishi h1 {
   font-size: 2rem;

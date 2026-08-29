@@ -105,7 +105,16 @@ export function App() {
   return (
     <>
       <header className="bar">
-        <strong>武鑑</strong>
+        <a className="brand" href="./" aria-label="武鑑">
+          <img
+            className="brand-mark"
+            src={`${import.meta.env.BASE_URL}bukan-logo-figure.png`}
+            width={32}
+            height={32}
+            alt=""
+          />
+          <strong>武鑑</strong>
+        </a>
         <form
           className="lookup"
           onSubmit={(e) => {
@@ -136,7 +145,16 @@ export function App() {
 
       {!snap && (
         <section className="meishi">
-          <h1>武鑑</h1>
+          <div className="meishi-brand">
+            <img
+              className="meishi-mark"
+              src={`${import.meta.env.BASE_URL}bukan-logo-figure.png`}
+              width={120}
+              height={120}
+              alt=""
+            />
+            <h1>武鑑</h1>
+          </div>
           <p>義と伝位の名鑑。ウォレットを入れると、検定と伝位を鎖から読みます。</p>
           <p className="muted">義はウォレット連携済みなら同じ数字を表示します。Discord 名は本人が `/bukan_public` したときだけ。</p>
           {err && <p className="err">{err}</p>}

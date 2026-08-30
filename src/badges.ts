@@ -104,7 +104,7 @@ export function collectBadges(
     family: "testnet",
     motif: "ume",
     label: "試験・検定",
-    hint: "Base Sepolia の ExamPass を持つと点灯（本番の伝位にはならない）",
+    hint: "Base Sepolia のいずれかの ExamPass を持つと点灯（本番の伝位にはならない）",
     lit: Boolean(test?.exam),
     adapter: "onchain",
   });
@@ -113,7 +113,7 @@ export function collectBadges(
     family: "testnet",
     motif: "tomoe",
     label: "試験・伝位",
-    hint: "Base Sepolia の Rank SBT を持つと点灯（本番の伝位にはならない）",
+    hint: "Base Sepolia のいずれかの Rank SBT を持つと点灯（本番の伝位にはならない）",
     lit: Boolean(test?.rank),
     adapter: "onchain",
   });

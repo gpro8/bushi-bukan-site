@@ -11,11 +11,27 @@ import { base, baseSepolia } from "viem/chains";
 export const EXAM = "0x58cf52F88a537F2343c8Da74760a03022E5Bd887" as Address;
 export const RANK = "0xCb454D0Da9536cC8CA01CF2B1B3D441fb25b4eaa" as Address;
 
-/** Legacy Base Sepolia soak — honor 家紋 only; never 伝位 / never migrate. */
-export const EXAM_SEPOLIA =
-  "0x05EcA5254B7804565317bc95D11d778C45d469F4" as Address;
-export const RANK_SEPOLIA =
-  "0x52bb0Af783ADE927322193488a8869066EAdd94D" as Address;
+/** All Base Sepolia soak deploys (forge 84532). Honor 家紋 only; never 伝位 / never migrate.
+ *  Lit if **any** contract in the list minted for this 0x (or alias). */
+export const EXAM_SEPOLIA_ALL = [
+  "0x2E0780750C9B630840f79d90dBa8fD35aAF8eE9F",
+  "0xCA0520017797eC7B206923aD4dca2e726DB5257c",
+  "0x04F2D553Dc76ea1a9aFf6844cc7Fa8F295d37a25",
+  "0x8674d1b2f591E390d206a936ab0367B81Fe4402F",
+  "0xbb55d39C335c848B9C905f3Dd9793102F5FBe5b8",
+  "0x05EcA5254B7804565317bc95D11d778C45d469F4",
+] as const satisfies readonly Address[];
+export const RANK_SEPOLIA_ALL = [
+  "0x996727D565dFC452491f961Ad370fe3F0B5dD124",
+  "0x030BEC5fC87711a6271396960384d51DcB622Ad3",
+  "0xA62626CCB6113680e52988017592037219Aee5cc",
+  "0xF145dC663a54162Ecb279c40C235eFa3a063948C",
+  "0xa2f0E56C4EB0Cbdd9A710449AB3E9b538798cECD",
+  "0x52bb0Af783ADE927322193488a8869066EAdd94D",
+] as const satisfies readonly Address[];
+/** Latest soak pair (docs / single-contract callers). */
+export const EXAM_SEPOLIA = EXAM_SEPOLIA_ALL[EXAM_SEPOLIA_ALL.length - 1];
+export const RANK_SEPOLIA = RANK_SEPOLIA_ALL[RANK_SEPOLIA_ALL.length - 1];
 
 export const EXAM_URL = "https://giuliav6-ai.github.io/web3-kentei/";
 export const SUKEDACHI_URL = "https://gpro8.github.io/sukedachi-site/";
@@ -139,7 +155,7 @@ export async function loadSnap(raw: string): Promise<ChainSnap> {
 
 export type TestSnap = { exam: boolean; rank: boolean };
 
-/** Sepolia soak SBTs. Honor only. Soft-fail → both unlit. */
+/** Sepolia soak SBTs across **all** forge deploys. Honor only. Soft-fail → both unlit. */
 export async function loadTestSnap(wallets: string[]): Promise<TestSnap> {
   const addrs: Address[] = [];
   for (const raw of wallets) {
@@ -149,29 +165,47 @@ export async function loadTestSnap(wallets: string[]): Promise<TestSnap> {
   }
   if (!addrs.length) return { exam: false, rank: false };
   try {
-    let exam = false;
-    let rank = false;
+    const contracts: {
+      address: Address;
+      abi: typeof RANK_ABI | typeof EXAM_ABI;
+      functionName: "currentRank" | "hasExamPass";
+      args: readonly [Address] | readonly [Address, number];
+    }[] = [];
     for (const wallet of addrs) {
-      const r = await sepoliaClient.readContract({
-        address: RANK_SEPOLIA,
-        abi: RANK_ABI,
-        functionName: "currentRank",
-        args: [wallet],
-      });
-      if (Number(r) > 0) rank = true;
-      const flags = await sepoliaClient.multicall({
-        allowFailure: true,
-        contracts: DENI.map((d) => ({
-          address: EXAM_SEPOLIA,
-          abi: EXAM_ABI,
-          functionName: "hasExamPass" as const,
-          args: [wallet, d.tier] as const,
-        })),
-      });
-      if (flags.some((f) => f.status === "success" && Boolean(f.result))) {
+      for (const address of RANK_SEPOLIA_ALL) {
+        contracts.push({
+          address,
+          abi: RANK_ABI,
+          functionName: "currentRank",
+          args: [wallet],
+        });
+      }
+      for (const address of EXAM_SEPOLIA_ALL) {
+        for (const d of DENI) {
+          contracts.push({
+            address,
+            abi: EXAM_ABI,
+            functionName: "hasExamPass",
+            args: [wallet, d.tier],
+          });
+        }
+      }
+    }
+    const nRank = addrs.length * RANK_SEPOLIA_ALL.length;
+    const flags = await sepoliaClient.multicall({
+      allowFailure: true,
+      contracts,
+    });
+    let rank = false;
+    let exam = false;
+    for (let i = 0; i < flags.length; i++) {
+      const f = flags[i];
+      if (f.status !== "success") continue;
+      if (i < nRank) {
+        if (Number(f.result) > 0) rank = true;
+      } else if (Boolean(f.result)) {
         exam = true;
       }
-      if (exam && rank) break;
     }
     return { exam, rank };
   } catch {

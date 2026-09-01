@@ -22,8 +22,8 @@ function corsHeaders(env, request) {
   const ok = !origin || allowed.includes(origin) || allowed.includes("*");
   return {
     "Access-Control-Allow-Origin": ok ? origin || "*" : allowed[0] || "null",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Link-Key",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
@@ -93,6 +93,86 @@ async function fromKv(env, wallet) {
   return data;
 }
 
+function originAllowed(env, request) {
+  const origin = request.headers.get("Origin") || "";
+  const allowed = (env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!origin) return false;
+  return allowed.includes(origin) || allowed.includes("*");
+}
+
+function parseLinkMessage(message) {
+  const m = String(message || "");
+  if (!m.startsWith("BushiDAO Wallet Link\n")) return null;
+  const id = /(?:^|\n)Discord: (\d{5,30})(?:\n|$)/.exec(m);
+  if (!id) return null;
+  if (m.length > 400) return null;
+  return id[1];
+}
+
+async function handleWalletLinkPost(request, env) {
+  if (!originAllowed(env, request)) {
+    return json({ ok: false, error: "origin_not_allowed" }, 403, env, request);
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "bad_json" }, 400, env, request);
+  }
+  const message = String(body.message || "");
+  const address = String(body.address || "").trim();
+  const signature = String(body.signature || "").trim();
+  const userId = parseLinkMessage(message);
+  if (!userId) return json({ ok: false, error: "bad_message" }, 400, env, request);
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    return json({ ok: false, error: "bad_wallet" }, 400, env, request);
+  }
+  if (!/^0x[a-fA-F0-9]{128,200}$/.test(signature)) {
+    return json({ ok: false, error: "bad_sig" }, 400, env, request);
+  }
+  if (!env.BUKAN_GI) return json({ ok: false, error: "no_kv" }, 503, env, request);
+  await env.BUKAN_GI.put(
+    `wlink:${userId}`,
+    JSON.stringify({ address, signature, message, at: Date.now() }),
+    { expirationTtl: 1800 }
+  );
+  return json({ ok: true }, 200, env, request);
+}
+
+async function handleWalletLinkGet(request, env, url) {
+  const key = env.WALLET_LINK_READ_KEY || "";
+  const got = request.headers.get("X-Link-Key") || "";
+  if (!key || got !== key) {
+    return json({ ok: false, error: "unauthorized" }, 401, env, request);
+  }
+  const user = String(url.searchParams.get("user") || "").trim();
+  if (!/^\d{5,30}$/.test(user)) {
+    return json({ ok: false, error: "bad_user" }, 400, env, request);
+  }
+  const raw = await env.BUKAN_GI.get(`wlink:${user}`);
+  if (!raw) return json({ ok: false, error: "not_found" }, 404, env, request);
+  let rec;
+  try {
+    rec = JSON.parse(raw);
+  } catch {
+    return json({ ok: false, error: "bad_store" }, 500, env, request);
+  }
+  return json(
+    {
+      ok: true,
+      address: rec.address,
+      signature: rec.signature,
+      message: rec.message,
+    },
+    200,
+    env,
+    request
+  );
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -112,6 +192,12 @@ export default {
         env,
         request
       );
+    }
+
+    if (url.pathname === "/v1/wallet-link") {
+      if (request.method === "POST") return handleWalletLinkPost(request, env);
+      if (request.method === "GET") return handleWalletLinkGet(request, env, url);
+      return json({ ok: false, error: "method" }, 405, env, request);
     }
 
     if (request.method !== "GET" || url.pathname !== "/v1/bukan") {

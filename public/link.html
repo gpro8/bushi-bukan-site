@@ -55,7 +55,7 @@
     border-radius: 10px;
     margin: 0 0 0.75rem;
   }
-  button, .ghost {
+  button, a.btn {
     display: block;
     width: 100%;
     border: 0;
@@ -65,6 +65,9 @@
     font-weight: 700;
     margin: 0.4rem 0;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
   }
   .primary { background: var(--accent); color: #1f3134; }
   .ok { background: var(--ok); color: #fff; }
@@ -74,39 +77,35 @@
     color: var(--text);
   }
   .msg { font-size: 0.86rem; color: var(--muted); min-height: 1.3em; }
-  .out {
-    font-size: 0.78rem;
-    word-break: break-all;
-    background: rgba(0,0,0,0.06);
-    padding: 0.65rem;
-    border-radius: 10px;
-    margin: 0.35rem 0 0.5rem;
-  }
   .hint { font-size: 0.8rem; color: var(--earth); margin-top: 0.75rem; }
+  .small { font-size: 0.78rem; color: var(--muted); margin: 0.2rem 0 0.6rem; }
+  #chooser { margin-top: 0.4rem; }
 </style>
 </head>
 <body>
   <div class="wrap">
     <h1>ウォレットで署名</h1>
-    <p class="lede">Discord のリンク用チャレンジです。スマホは <strong>ウォレットアプリ内のブラウザ</strong> でこのページを開いてください。</p>
+    <p class="lede" id="lede">Discord のリンク用です。ウォレットアプリで開いて署名します。</p>
     <div class="card">
       <pre id="msg">読み込み中…</pre>
       <button type="button" class="ghost" id="copyMsg">メッセージをコピー</button>
-      <button type="button" class="primary" id="signBtn">接続して署名</button>
-      <p class="msg" id="status"></p>
-      <div id="result" hidden>
-        <div>アドレス</div>
-        <div class="out" id="addr"></div>
-        <button type="button" class="ghost" id="copyAddr">アドレスをコピー</button>
-        <div>署名</div>
-        <div class="out" id="sig"></div>
-        <button type="button" class="ok" id="copySig">署名をコピー</button>
-        <p class="hint">Discord に戻り、<strong>署名を提出</strong> を押して貼ってください。</p>
+      <div id="chooser" hidden>
+        <p class="small">使っているウォレットを選ぶ（MetaMask · Trust · Rainbow · Rabby）</p>
+        <a class="btn primary" id="openMm" href="#">MetaMask で開く</a>
+        <a class="btn ghost" id="openTrust" href="#">Trust で開く</a>
+        <a class="btn ghost" id="openRainbow" href="#">Rainbow で開く</a>
+        <a class="btn ghost" id="openRabby" href="#">Rabby で開く</a>
+        <button type="button" class="ghost" id="copyUrl">このページのURLをコピー</button>
+        <p class="hint">Discord / Safari だけでは署名できません。上でウォレットが開かないときは、コピーしたURLをウォレット内ブラウザに貼ってください。</p>
       </div>
+      <button type="button" class="primary" id="signBtn" hidden>接続して署名</button>
+      <p class="msg" id="status"></p>
+      <p class="hint" id="done" hidden>Discord に戻り、<strong>確認</strong> を押してください。コピーは不要です。</p>
     </div>
   </div>
 <script>
 (function () {
+  var POST = "https://bushi-bukan-api.bushidao.workers.dev/v1/wallet-link";
   function b64url(s) {
     s = (s || "").replace(/-/g, "+").replace(/_/g, "/");
     while (s.length % 4) s += "=";
@@ -121,8 +120,7 @@
   var pre = document.getElementById("msg");
   var status = document.getElementById("status");
   if (!msg) {
-    pre.textContent = "チャレンジがありません。Discord の「ウォレットで署名」から開いてください。";
-    document.getElementById("signBtn").disabled = true;
+    pre.textContent = "チャレンジがありません。Discord の「ウォレットで開く」から開いてください。";
     return;
   }
   pre.textContent = msg;
@@ -137,9 +135,42 @@
   document.getElementById("copyMsg").onclick = function () {
     copy(msg, "メッセージをコピーしました。");
   };
+
+  var href = location.href;
+  var pathNoScheme = location.host + location.pathname + location.search;
+  document.getElementById("openMm").href = "https://metamask.app.link/dapp/" + pathNoScheme;
+  document.getElementById("openTrust").href = "https://link.trustwallet.com/open_url?coin_id=60&url=" + encodeURIComponent(href);
+  document.getElementById("openRainbow").href = "https://rainbow.me/dapp?url=" + encodeURIComponent(href);
+  document.getElementById("openRabby").href = "https://rabby.io/mobile";
+  document.getElementById("copyUrl").onclick = function () {
+    copy(href, "URLをコピーしました。ウォレット内ブラウザに貼ってください。");
+  };
+
+  var hasEth = typeof window.ethereum !== "undefined";
+  if (hasEth) {
+    document.getElementById("signBtn").hidden = false;
+    document.getElementById("lede").textContent = "接続して署名 → Discord で確認。コピー不要です。";
+  } else {
+    document.getElementById("chooser").hidden = false;
+  }
+
+  async function postSig(account, signature) {
+    var res = await fetch(POST, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg, address: account, signature: signature }),
+    });
+    var data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "送信に失敗しました");
+    }
+  }
+
   document.getElementById("signBtn").onclick = async function () {
     if (!window.ethereum) {
-      status.textContent = "ウォレットが見つかりません。MetaMask などのアプリ内ブラウザで開き直してください。";
+      document.getElementById("chooser").hidden = false;
+      status.textContent = "ウォレットが見つかりません。下からアプリで開いてください。";
       return;
     }
     try {
@@ -151,16 +182,10 @@
         method: "personal_sign",
         params: [msg, account],
       });
-      document.getElementById("addr").textContent = account;
-      document.getElementById("sig").textContent = signature;
-      document.getElementById("result").hidden = false;
-      status.textContent = "完了。下をコピーして Discord へ。";
-      document.getElementById("copyAddr").onclick = function () {
-        copy(account, "アドレスをコピーしました。");
-      };
-      document.getElementById("copySig").onclick = function () {
-        copy(signature, "署名をコピーしました。");
-      };
+      status.textContent = "送信中…";
+      await postSig(account, signature);
+      document.getElementById("done").hidden = false;
+      status.textContent = "完了。Discord に戻って「確認」を押してください。";
     } catch (e) {
       status.textContent = (e && e.message) ? e.message : "署名できませんでした。";
     }

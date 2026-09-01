@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ウォレット署名 · BushiDAO</title>
+<meta name="description" content="Discord リンク用のチャレンジに署名します。BushiDAO。" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f4f1ea;
+    --panel: #fffdf8;
+    --text: #1f3134;
+    --muted: #6c7a7f;
+    --accent: #c9a227;
+    --earth: #917347;
+    --ok: #3d7a62;
+    --border: #e4d8c4;
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1814;
+      --panel: #242018;
+      --text: #f4efe6;
+      --muted: #a89b88;
+      --border: #3a342c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 1.25rem 1rem 2.5rem;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 440px; margin: 0 auto; }
+  h1 { font-size: 1.2rem; margin: 0 0 0.35rem; }
+  .lede { color: var(--muted); font-size: 0.88rem; margin-bottom: 1rem; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.05rem 1.15rem;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.82rem;
+    background: rgba(0,0,0,0.06);
+    padding: 0.75rem;
+    border-radius: 10px;
+    margin: 0 0 0.75rem;
+  }
+  button, .ghost {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0.4rem 0;
+    cursor: pointer;
+  }
+  .primary { background: var(--accent); color: #1f3134; }
+  .ok { background: var(--ok); color: #fff; }
+  .ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .msg { font-size: 0.86rem; color: var(--muted); min-height: 1.3em; }
+  .out {
+    font-size: 0.78rem;
+    word-break: break-all;
+    background: rgba(0,0,0,0.06);
+    padding: 0.65rem;
+    border-radius: 10px;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .hint { font-size: 0.8rem; color: var(--earth); margin-top: 0.75rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>ウォレットで署名</h1>
+    <p class="lede">Discord のリンク用チャレンジです。スマホは <strong>ウォレットアプリ内のブラウザ</strong> でこのページを開いてください。</p>
+    <div class="card">
+      <pre id="msg">読み込み中…</pre>
+      <button type="button" class="ghost" id="copyMsg">メッセージをコピー</button>
+      <button type="button" class="primary" id="signBtn">接続して署名</button>
+      <p class="msg" id="status"></p>
+      <div id="result" hidden>
+        <div>アドレス</div>
+        <div class="out" id="addr"></div>
+        <button type="button" class="ghost" id="copyAddr">アドレスをコピー</button>
+        <div>署名</div>
+        <div class="out" id="sig"></div>
+        <button type="button" class="ok" id="copySig">署名をコピー</button>
+        <p class="hint">Discord に戻り、<strong>署名を提出</strong> を押して貼ってください。</p>
+      </div>
+    </div>
+  </div>
+<script>
+(function () {
+  function b64url(s) {
+    s = (s || "").replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  var q = new URLSearchParams(location.search).get("m") || "";
+  var msg = "";
+  try { msg = b64url(q); } catch (e) { msg = ""; }
+  var pre = document.getElementById("msg");
+  var status = document.getElementById("status");
+  if (!msg) {
+    pre.textContent = "チャレンジがありません。Discord の「ウォレットで署名」から開いてください。";
+    document.getElementById("signBtn").disabled = true;
+    return;
+  }
+  pre.textContent = msg;
+
+  function copy(text, ok) {
+    return navigator.clipboard.writeText(text).then(function () {
+      status.textContent = ok;
+    }).catch(function () {
+      status.textContent = "長押しでコピーしてください。";
+    });
+  }
+  document.getElementById("copyMsg").onclick = function () {
+    copy(msg, "メッセージをコピーしました。");
+  };
+  document.getElementById("signBtn").onclick = async function () {
+    if (!window.ethereum) {
+      status.textContent = "ウォレットが見つかりません。MetaMask などのアプリ内ブラウザで開き直してください。";
+      return;
+    }
+    try {
+      status.textContent = "接続中…";
+      var accs = await window.ethereum.request({ method: "eth_requestAccounts" });
+      var account = accs[0];
+      status.textContent = "署名してください…";
+      var signature = await window.ethereum.request({
+        method: "personal_sign",
+        params: [msg, account],
+      });
+      document.getElementById("addr").textContent = account;
+      document.getElementById("sig").textContent = signature;
+      document.getElementById("result").hidden = false;
+      status.textContent = "完了。下をコピーして Discord へ。";
+      document.getElementById("copyAddr").onclick = function () {
+        copy(account, "アドレスをコピーしました。");
+      };
+      document.getElementById("copySig").onclick = function () {
+        copy(signature, "署名をコピーしました。");
+      };
+    } catch (e) {
+      status.textContent = (e && e.message) ? e.message : "署名できませんでした。";
+    }
+  };
+})();
+</script>
+</body>
+</html>

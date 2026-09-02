@@ -100,7 +100,7 @@
       </div>
       <button type="button" class="primary" id="signBtn" hidden>接続して署名</button>
       <p class="msg" id="status"></p>
-      <p class="hint" id="done" hidden>Discord に戻り、<strong>確認</strong> を押してください。コピーは不要です。</p>
+      <p class="hint" id="done" hidden>送信しました。この画面のまま 5 秒待ってから Discord に戻り、<strong>確認</strong> を押してください。『届いていません』と出たら、もう 5 秒待って再タップ。</p>
     </div>
   </div>
 <script>
@@ -211,7 +211,7 @@
       status.textContent = "送信中…";
       await postSig(account, signature);
       document.getElementById("done").hidden = false;
-      status.textContent = "完了。Discord に戻って「確認」を押してください。";
+      status.textContent = "送信完了。5秒待ってから Discord で「確認」。";
     } catch (e) {
       status.textContent = (e && e.message) ? e.message : "署名できませんでした。";
     }

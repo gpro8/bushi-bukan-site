@@ -22,7 +22,7 @@ function corsHeaders(env, request) {
   const ok = !origin || allowed.includes(origin) || allowed.includes("*");
   return {
     "Access-Control-Allow-Origin": ok ? origin || "*" : allowed[0] || "null",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Link-Key",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
@@ -173,6 +173,20 @@ async function handleWalletLinkGet(request, env, url) {
   );
 }
 
+async function handleWalletLinkDelete(request, env, url) {
+  const key = env.WALLET_LINK_READ_KEY || "";
+  const got = request.headers.get("X-Link-Key") || "";
+  if (!key || got !== key) {
+    return json({ ok: false, error: "unauthorized" }, 401, env, request);
+  }
+  const user = String(url.searchParams.get("user") || "").trim();
+  if (!/^\d{5,30}$/.test(user)) {
+    return json({ ok: false, error: "bad_user" }, 400, env, request);
+  }
+  if (env.BUKAN_GI) await env.BUKAN_GI.delete(`wlink:${user}`);
+  return json({ ok: true }, 200, env, request);
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -197,6 +211,7 @@ export default {
     if (url.pathname === "/v1/wallet-link") {
       if (request.method === "POST") return handleWalletLinkPost(request, env);
       if (request.method === "GET") return handleWalletLinkGet(request, env, url);
+      if (request.method === "DELETE") return handleWalletLinkDelete(request, env, url);
       return json({ ok: false, error: "method" }, 405, env, request);
     }
 

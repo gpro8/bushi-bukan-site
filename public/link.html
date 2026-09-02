@@ -167,6 +167,35 @@
     }
   }
 
+  function utf8Hex(s) {
+    var bytes = new TextEncoder().encode(s);
+    var h = "0x";
+    for (var i = 0; i < bytes.length; i++) h += bytes[i].toString(16).padStart(2, "0");
+    return h;
+  }
+
+  async function personalSign(account) {
+    var hex = utf8Hex(msg);
+    try {
+      return await window.ethereum.request({
+        method: "personal_sign",
+        params: [hex, account],
+      });
+    } catch (e1) {
+      try {
+        return await window.ethereum.request({
+          method: "personal_sign",
+          params: [account, hex],
+        });
+      } catch (e2) {
+        return await window.ethereum.request({
+          method: "personal_sign",
+          params: [msg, account],
+        });
+      }
+    }
+  }
+
   document.getElementById("signBtn").onclick = async function () {
     if (!window.ethereum) {
       document.getElementById("chooser").hidden = false;
@@ -178,10 +207,7 @@
       var accs = await window.ethereum.request({ method: "eth_requestAccounts" });
       var account = accs[0];
       status.textContent = "署名してください…";
-      var signature = await window.ethereum.request({
-        method: "personal_sign",
-        params: [msg, account],
-      });
+      var signature = await personalSign(account);
       status.textContent = "送信中…";
       await postSig(account, signature);
       document.getElementById("done").hidden = false;

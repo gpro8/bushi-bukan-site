@@ -20,6 +20,7 @@ import {
   type TestSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
+import { DigitPop } from "./DigitPop";
 import { HeroCopy, HeroStub } from "./HeroStub";
 import { toggleTheme, type ThemeMode } from "./theme";
 
@@ -222,8 +223,9 @@ export function App() {
               <h2>貢献層</h2>
               {gi ? (
                 <>
-                  <div className="big">
-                    {gi.pot ?? gi.total} <span style={{ fontSize: "1rem" }}>義</span>
+                  <div className="big gi-in">
+                    <DigitPop value={String(gi.pot ?? gi.total)} />{" "}
+                    <span style={{ fontSize: "1rem" }}>義</span>
                   </div>
                   <p className="lane">いまの総義</p>
                   <p className="lane">
@@ -259,6 +261,14 @@ export function App() {
                     <i style={{ width: `${pct(gi.bonus, gi.lifetime ?? gi.total)}%` }} />
                   </div>
                 </>
+              ) : busy && giLinked !== false ? (
+                <div className="t-skel-skeleton is-pulsing" aria-busy="true" aria-label="義を読み込み中">
+                  <div className="t-skel-bar t-skel-bar-lg" />
+                  <div className="t-skel-bar" />
+                  <div className="t-skel-bar" />
+                  <div className="t-skel-bar" />
+                  <div className="t-skel-bar" />
+                </div>
               ) : (
                 <>
                   <div className="big muted-big">—</div>
@@ -281,7 +291,13 @@ export function App() {
             </div>
           </div>
 
-          <EmblemShelf snap={snap} suke={suke} events={events} test={test} />
+          <EmblemShelf
+            snap={snap}
+            suke={suke}
+            events={events}
+            test={test}
+            loading={busy && suke === null}
+          />
 
           {key &&
             (key.href ? (

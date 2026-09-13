@@ -10,11 +10,13 @@ export function EmblemShelf({
   suke,
   events,
   test,
+  loading = false,
 }: {
   snap: ChainSnap;
   suke: SukeSnap | null;
   events: EventSnap | null;
   test: TestSnap | null;
+  loading?: boolean;
 }) {
   const badges = useMemo(
     () => collectBadges(snap, suke, events, test),
@@ -38,9 +40,18 @@ export function EmblemShelf({
     <div className="shelf">
       <h2>所持家紋</h2>
       <p className="shelf-meta">
-        {litN} / {badges.length} 点灯 · 家紋を押すと道が見えます
+        {loading
+          ? "家紋を読み込み中"
+          : `${litN} / ${badges.length} 点灯 · 家紋を押すと道が見えます`}
       </p>
-      <div className="mons" role="list">
+      {loading ? (
+        <div className="mons t-skel-skeleton is-pulsing" role="list" aria-busy="true">
+          {Array.from({ length: 8 }, (_, i) => (
+            <span key={i} className="mon t-skel-mon" role="listitem" />
+          ))}
+        </div>
+      ) : (
+      <div className="mons gi-in" role="list">
         {shown.map((b) => (
           <button
             key={b.id}
@@ -66,12 +77,13 @@ export function EmblemShelf({
           </button>
         ) : null}
       </div>
-      {open && extra > 0 ? (
+      )}
+      {!loading && open && extra > 0 ? (
         <button type="button" className="shelf-fold" onClick={() => setOpen(false)}>
           しまって +{extra}
         </button>
       ) : null}
-      {picked ? (
+      {!loading && (picked ? (
         <div className="mon-card">
           <strong>{picked.label}</strong>
           <span className="mon-state">{picked.lit ? "点灯" : "未点灯 · 招待"}</span>
@@ -79,7 +91,7 @@ export function EmblemShelf({
         </div>
       ) : (
         <p className="muted shelf-invite">未点灯は欠落ではなく、まだ歩ける道です。</p>
-      )}
+      ))}
     </div>
   );
 }

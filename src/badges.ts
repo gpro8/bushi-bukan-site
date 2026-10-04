@@ -122,7 +122,7 @@ export function collectBadges(
     family: "auction",
     motif: "kiri",
     label: "出陣",
-    hint: "Bushi Collection 競売に参加すると点灯（第一ロット後）",
+    hint: "武士コレの競売に参加すると点灯。第1回は終了",
     lit: false,
     adapter: "offchain",
   });

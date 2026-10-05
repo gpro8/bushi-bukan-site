@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   DENI,
   deniOf,
@@ -22,6 +22,7 @@ import {
 import { EmblemShelf } from "./EmblemShelf";
 import { DigitPop } from "./DigitPop";
 import { HeroCopy, HeroStub } from "./HeroStub";
+import { loadCollection, type CollectionHold } from "./collection";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -45,6 +46,8 @@ export function App() {
   const [giLinked, setGiLinked] = useState<boolean | null>(null);
   const [aliases, setAliases] = useState<string[]>([]);
   const [primary, setPrimary] = useState<string | null>(null);
+  const [hold, setHold] = useState<CollectionHold | null>(null);
+  const [cutoutOk, setCutoutOk] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -59,6 +62,8 @@ export function App() {
     setGiLinked(null);
     setAliases([]);
     setPrimary(null);
+    setHold(null);
+    setCutoutOk(false);
     try {
       const s = await loadSnap(raw);
       setSnap(s);
@@ -75,6 +80,8 @@ export function App() {
         Boolean
       ) as string[];
       setTest(await loadTestSnap(testWallets));
+      const held = await loadCollection(testWallets);
+      setHold(held[0] ?? null);
       const sk = await loadSuke(s.wallet);
       setSuke(sk);
     } catch (e) {
@@ -168,7 +175,15 @@ export function App() {
 
       {snap && (
         <>
-          <div className="stage">
+          <div
+            className="stage"
+            data-face={hold ? "1" : undefined}
+            style={
+              hold
+                ? ({ ["--washi"]: hold.backgroundColor } as CSSProperties)
+                : undefined
+            }
+          >
             <div className="who">
               <div>
                 {pub?.displayName ? (
@@ -213,9 +228,14 @@ export function App() {
                   ) : null}
                 </div>
               ) : null}
-              <HeroCopy snap={snap} />
+              <HeroCopy snap={snap} hold={hold} cutoutOk={cutoutOk} />
             </div>
-            <HeroStub snap={snap} />
+            <HeroStub
+              snap={snap}
+              hold={hold}
+              cutoutOk={cutoutOk}
+              onCutout={setCutoutOk}
+            />
           </div>
 
           <div className="grid">

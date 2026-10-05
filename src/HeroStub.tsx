@@ -1,6 +1,7 @@
 import { deniOf } from "./chain";
 import { KamonMark, type Motif } from "./kamon";
 import type { ChainSnap } from "./chain";
+import { cutoutSrc, type CollectionHold } from "./collection";
 
 const EXAM_MOTIF: Motif[] = ["ume", "ya", "kiku", "tomoe", "kiri", "rinpo"];
 
@@ -12,8 +13,32 @@ function watermarkOf(snap: ChainSnap): Motif | null {
   return null;
 }
 
-export function HeroCopy({ snap }: { snap: ChainSnap }) {
+export function HeroCopy({
+  snap,
+  hold,
+  cutoutOk,
+}: {
+  snap: ChainSnap;
+  hold: CollectionHold | null;
+  cutoutOk: boolean;
+}) {
   const deni = deniOf(snap.rank);
+  if (hold && cutoutOk) {
+    return (
+      <div className="hero-copy">
+        <strong>{hold.name || "Bushi Collection"}</strong>
+        <p>所持の顔。和紙の色は作品の背景色です。</p>
+      </div>
+    );
+  }
+  if (hold && !cutoutOk) {
+    return (
+      <div className="hero-copy">
+        <strong>和紙は開いた</strong>
+        <p>所持はあります。顔の切り抜き PNG を待っています。</p>
+      </div>
+    );
+  }
   return (
     <div className="hero-copy">
       <strong>空の和紙</strong>
@@ -26,18 +51,38 @@ export function HeroCopy({ snap }: { snap: ChainSnap }) {
   );
 }
 
-/** Right column only — no text. Future Collection face lives here. */
-export function HeroStub({ snap }: { snap: ChainSnap }) {
+/** Right column — Collection cutout on 和紙, else 家紋 watermark. */
+export function HeroStub({
+  snap,
+  hold,
+  cutoutOk,
+  onCutout,
+}: {
+  snap: ChainSnap;
+  hold: CollectionHold | null;
+  cutoutOk: boolean;
+  onCutout: (ok: boolean) => void;
+}) {
   const motif = watermarkOf(snap);
   return (
-    <div className="hero" aria-hidden="true">
-      {motif ? (
+    <div className="hero" aria-hidden={!cutoutOk}>
+      {hold ? (
+        <div className="hero-face">
+          <img
+            src={cutoutSrc(hold.tokenId)}
+            alt=""
+            onLoad={() => onCutout(true)}
+            onError={() => onCutout(false)}
+            hidden={!cutoutOk}
+          />
+        </div>
+      ) : null}
+      {!cutoutOk && motif ? (
         <div className="hero-mark">
           <KamonMark motif={motif} />
         </div>
-      ) : (
-        <div className="hero-void" />
-      )}
+      ) : null}
+      {!cutoutOk && !motif ? <div className="hero-void" /> : null}
     </div>
   );
 }

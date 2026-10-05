@@ -147,9 +147,9 @@ body {
       color-mix(in srgb, var(--ink) 4%, transparent) 4px
     );
 }
-html[data-theme="dark"] .stage:not([data-face]) {
+html[data-theme="dark"] .stage {
   background:
-    radial-gradient(120% 90% at 72% 32%, #2c261e 0%, #1f1c18 60%, #141210 100%);
+    radial-gradient(120% 90% at 72% 32%, rgb(44, 38, 30), rgb(31, 28, 24) 60%, rgb(20, 18, 16));
 }
 @media (min-width: 760px) {
   .stage {
@@ -237,12 +237,6 @@ html[data-theme="dark"] .stage:not([data-face]) {
     object-fit: cover;
     object-position: right top;
   }
-  .stage[data-face] .hero-copy {
-    max-width: none;
-  }
-  .stage[data-face] .hero-copy strong {
-    white-space: nowrap;
-  }
 }
 .hero-copy {
   position: relative;
@@ -252,6 +246,14 @@ html[data-theme="dark"] .stage:not([data-face]) {
 }
 .hero-copy strong {
   font-size: 0.92rem;
+}
+@media (min-width: 760px) {
+  .stage[data-face] .hero-copy {
+    max-width: none;
+  }
+  .stage[data-face] .hero-copy strong {
+    white-space: nowrap;
+  }
 }
 .hero-copy p {
   margin-top: 0.2rem;

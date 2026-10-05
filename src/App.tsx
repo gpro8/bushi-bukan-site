@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DENI,
   deniOf,
@@ -175,15 +175,7 @@ export function App() {
 
       {snap && (
         <>
-          <div
-            className="stage"
-            data-face={hold ? "1" : undefined}
-            style={
-              hold
-                ? ({ ["--washi"]: hold.backgroundColor } as CSSProperties)
-                : undefined
-            }
-          >
+          <div className="stage">
             <div className="who">
               <div>
                 {pub?.displayName ? (

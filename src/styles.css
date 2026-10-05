@@ -118,24 +118,6 @@ body {
     radial-gradient(120% 90% at 72% 32%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
   border: 1px solid var(--line);
 }
-.stage[data-face] {
-  background:
-    radial-gradient(
-      120% 90% at 72% 32%,
-      var(--washi, #f5f0e6) 0%,
-      color-mix(in srgb, var(--washi, #f5f0e6) 88%, #c9b896) 100%
-    );
-}
-.stage[data-face] .who,
-.stage[data-face] .hero-copy,
-.stage[data-face] .sub,
-.stage[data-face] .aliases {
-  color: #1b1916;
-}
-.stage[data-face] .hero-copy p,
-.stage[data-face] .aliases {
-  color: #4a4338;
-}
 .stage::before {
   content: "";
   position: absolute;
@@ -156,7 +138,7 @@ body {
       color-mix(in srgb, var(--ink) 4%, transparent) 4px
     );
 }
-html[data-theme="dark"] .stage:not([data-face]) {
+html[data-theme="dark"] .stage {
   background:
     radial-gradient(120% 90% at 72% 32%, #2c261e 0%, #1f1c18 60%, #141210 100%);
 }

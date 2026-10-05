@@ -23,19 +23,10 @@ export function HeroCopy({
   cutoutOk: boolean;
 }) {
   const deni = deniOf(snap.rank);
-  if (hold && cutoutOk) {
+  if (hold) {
     return (
       <div className="hero-copy">
         <strong>{hold.name || "Bushi Collection"}</strong>
-        <p>所持の顔。和紙の色は作品の背景色です。</p>
-      </div>
-    );
-  }
-  if (hold && !cutoutOk) {
-    return (
-      <div className="hero-copy">
-        <strong>和紙は開いた</strong>
-        <p>所持はあります。顔の切り抜き PNG を待っています。</p>
       </div>
     );
   }

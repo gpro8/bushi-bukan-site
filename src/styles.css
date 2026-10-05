@@ -156,10 +156,21 @@ html[data-theme="dark"] .stage {
   flex-direction: column;
   justify-content: flex-start;
 }
+@media (min-width: 760px) {
+  .who {
+    justify-content: flex-end;
+  }
+}
 .hero {
   position: relative;
   min-height: 200px;
   overflow: hidden;
+}
+@media (min-width: 760px) {
+  .hero {
+    container-type: inline-size;
+    min-height: 85cqw;
+  }
 }
 .hero-mark {
   position: absolute;
@@ -200,6 +211,13 @@ html[data-theme="dark"] .stage {
   object-fit: contain;
   object-position: right bottom;
   display: block;
+}
+@media (min-width: 760px) {
+  .hero-face img {
+    width: 85%;
+    height: auto;
+    max-width: 85%;
+  }
 }
 .hero-copy {
   position: relative;

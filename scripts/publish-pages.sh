@@ -30,7 +30,7 @@ git worktree add --detach "$wt" origin/gh-pages
 # Drop previous root publish. Keep the 巻物 preview.
 find "$wt" -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'makimono' -exec rm -rf {} +
 cp -R dist/. "$wt/"
-rm -f "$wt/.DS_Store"
+find "$wt" -name '.DS_Store' -delete
 touch "$wt/.nojekyll"
 
 cd "$wt"

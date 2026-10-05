@@ -20,7 +20,8 @@ export function collectBadges(
   snap: ChainSnap,
   suke: SukeSnap | null,
   events: EventSnap | null,
-  test: TestSnap | null = null
+  test: TestSnap | null = null,
+  bidLit = false
 ): Badge[] {
   const out: Badge[] = [];
   for (const d of DENI) {
@@ -123,8 +124,8 @@ export function collectBadges(
     motif: "kiri",
     label: "出陣",
     hint: "武士コレの競売に参加すると点灯。第1回は終了",
-    lit: false,
-    adapter: "offchain",
+    lit: bidLit,
+    adapter: "onchain",
   });
   return out;
 }

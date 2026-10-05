@@ -23,6 +23,7 @@ import { EmblemShelf } from "./EmblemShelf";
 import { DigitPop } from "./DigitPop";
 import { HeroCopy, HeroStub } from "./HeroStub";
 import { loadCollection, type CollectionHold } from "./collection";
+import { bidderSet, refreshBidders, walletHasBid } from "./auctionBid";
 import { toggleTheme, type ThemeMode } from "./theme";
 
 function pct(part: number, total: number) {
@@ -47,6 +48,7 @@ export function App() {
   const [aliases, setAliases] = useState<string[]>([]);
   const [primary, setPrimary] = useState<string | null>(null);
   const [hold, setHold] = useState<CollectionHold | null>(null);
+  const [bidders, setBidders] = useState(() => bidderSet());
   const [cutoutOk, setCutoutOk] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -95,6 +97,7 @@ export function App() {
   useEffect(() => {
     const initial = parseWalletParam();
     if (initial) void lookup(initial);
+    void refreshBidders().then(setBidders);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -316,6 +319,10 @@ export function App() {
             suke={suke}
             events={events}
             test={test}
+            bidLit={walletHasBid(
+              [snap.wallet, primary, ...aliases].filter(Boolean) as string[],
+              bidders
+            )}
             loading={busy && suke === null}
           />
 

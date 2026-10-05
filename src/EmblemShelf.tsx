@@ -10,17 +10,19 @@ export function EmblemShelf({
   suke,
   events,
   test,
+  bidLit = false,
   loading = false,
 }: {
   snap: ChainSnap;
   suke: SukeSnap | null;
   events: EventSnap | null;
   test: TestSnap | null;
+  bidLit?: boolean;
   loading?: boolean;
 }) {
   const badges = useMemo(
-    () => collectBadges(snap, suke, events, test),
-    [snap, suke, events, test]
+    () => collectBadges(snap, suke, events, test, bidLit),
+    [snap, suke, events, test, bidLit]
   );
   const ordered = useMemo(() => {
     const lit = badges.filter((b) => b.lit);

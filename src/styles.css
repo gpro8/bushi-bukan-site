@@ -146,6 +146,8 @@ html[data-theme="dark"] .stage {
   .stage {
     grid-template-columns: 1fr 1.05fr;
     align-items: stretch;
+    min-height: 0;
+    padding-top: 20px;
   }
 }
 .who {
@@ -159,6 +161,7 @@ html[data-theme="dark"] .stage {
 @media (min-width: 760px) {
   .who {
     justify-content: flex-end;
+    padding-top: 0;
   }
 }
 .hero {
@@ -169,7 +172,7 @@ html[data-theme="dark"] .stage {
 @media (min-width: 760px) {
   .hero {
     container-type: inline-size;
-    min-height: 85cqw;
+    min-height: 56cqw;
   }
 }
 .hero-mark {
@@ -215,8 +218,10 @@ html[data-theme="dark"] .stage {
 @media (min-width: 760px) {
   .hero-face img {
     width: 85%;
-    height: auto;
+    height: 100%;
     max-width: 85%;
+    object-fit: cover;
+    object-position: right bottom;
   }
 }
 .hero-copy {

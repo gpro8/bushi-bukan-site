@@ -118,6 +118,15 @@ body {
     radial-gradient(120% 90% at 72% 32%, #fffaf2 0%, #f3ead6 52%, #e4d4b6 100%);
   border: 1px solid var(--line);
 }
+.stage[data-face] {
+  background:
+    radial-gradient(
+      120% 90% at 72% 32%,
+      color-mix(in srgb, var(--washi, #f5f0e6) 72%, #fff) 0%,
+      var(--washi, #f5f0e6) 52%,
+      color-mix(in srgb, var(--washi, #f5f0e6) 78%, #c9b896) 100%
+    );
+}
 .stage::before {
   content: "";
   position: absolute;
@@ -138,7 +147,7 @@ body {
       color-mix(in srgb, var(--ink) 4%, transparent) 4px
     );
 }
-html[data-theme="dark"] .stage {
+html[data-theme="dark"] .stage:not([data-face]) {
   background:
     radial-gradient(120% 90% at 72% 32%, #2c261e 0%, #1f1c18 60%, #141210 100%);
 }
@@ -147,6 +156,8 @@ html[data-theme="dark"] .stage {
     grid-template-columns: 1fr 1.05fr;
     align-items: stretch;
     min-height: 0;
+  }
+  .stage[data-face] {
     padding-top: 20px;
   }
 }
@@ -171,8 +182,14 @@ html[data-theme="dark"] .stage {
 }
 @media (min-width: 760px) {
   .hero {
-    container-type: inline-size;
-    min-height: 56cqw;
+    min-height: 200px;
+  }
+  .stage[data-face] .hero {
+    min-height: 0;
+  }
+  .stage[data-face] .hero-face {
+    position: relative;
+    inset: auto;
   }
 }
 .hero-mark {
@@ -218,9 +235,9 @@ html[data-theme="dark"] .stage {
 @media (min-width: 760px) {
   .hero-face img {
     width: 85%;
-    height: 100%;
+    height: auto;
     max-width: 85%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: right bottom;
   }
 }

@@ -202,16 +202,15 @@ html[data-theme="dark"] .stage {
   transform: translate(-50%, -50%);
 }
 .hero-face {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
   z-index: 1;
 }
 .hero-face img {
-  height: 100%;
-  width: auto;
+  height: auto;
+  width: 100%;
   max-width: 100%;
   object-fit: contain;
   object-position: right bottom;
@@ -241,7 +240,7 @@ html[data-theme="dark"] .stage {
 .hero-copy {
   position: relative;
   margin-top: 0.85rem;
-  max-width: 18rem;
+  max-width: 21rem;
   color: var(--ink);
 }
 .hero-copy strong {

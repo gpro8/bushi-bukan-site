@@ -157,9 +157,6 @@ html[data-theme="dark"] .stage:not([data-face]) {
     align-items: stretch;
     min-height: 0;
   }
-  .stage[data-face] {
-    padding-top: 20px;
-  }
 }
 .who {
   position: relative;
@@ -179,18 +176,6 @@ html[data-theme="dark"] .stage:not([data-face]) {
   position: relative;
   min-height: 200px;
   overflow: hidden;
-}
-@media (min-width: 760px) {
-  .hero {
-    min-height: 200px;
-  }
-  .stage[data-face] .hero {
-    min-height: 0;
-  }
-  .stage[data-face] .hero-face {
-    position: relative;
-    inset: auto;
-  }
 }
 .hero-mark {
   position: absolute;
@@ -233,12 +218,30 @@ html[data-theme="dark"] .stage:not([data-face]) {
   display: block;
 }
 @media (min-width: 760px) {
-  .hero-face img {
-    width: 85%;
-    height: auto;
-    max-width: 85%;
-    object-fit: contain;
-    object-position: right bottom;
+  .stage[data-face] {
+    padding-top: 20px;
+  }
+  .stage[data-face] .hero {
+    height: 360px;
+    min-height: 360px;
+    overflow: hidden;
+  }
+  .stage[data-face] .hero-face {
+    position: absolute;
+    inset: 0;
+  }
+  .stage[data-face] .hero-face img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    object-fit: cover;
+    object-position: right top;
+  }
+  .stage[data-face] .hero-copy {
+    max-width: none;
+  }
+  .stage[data-face] .hero-copy strong {
+    white-space: nowrap;
   }
 }
 .hero-copy {

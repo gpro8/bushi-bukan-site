@@ -12,14 +12,15 @@ import { base } from "viem/chains";
 export const AUCTION = "0x7e8bFB5126A74127Cd0011726741a17E56093fAC" as Address;
 
 /**
- * First BidPlaced is block 52074289. Do not scan from deploy
+ * Opening BidPlaced is block 52033336 (0.01 ETH). Do not scan from deploy
  * (2.1M blocks). mainnet.base.org allows 500 blocks per getLogs.
- * Seed is the full lot-1 set verified through 52165000 (0 failed chunks).
+ * Seed is the full lot-1 set: opening bid through 52165000, 0 failed chunks.
  */
-const FLOOR = 52070000n;
+const FLOOR = 52025000n;
 const SEED_TO = 52165000n;
 const CHUNK = 499n;
 const SEED = [
+  "0x3c2d71b48832e682f539733cc286f08c34e4ef54",
   "0x0d546afb4bda5e60c4d31bde126cb3700ea8977a",
   "0xd06584400f55099ee2c872b53a48f1ff85067c4a",
   "0xdc153ee06e5112633a5d4ef4f61ff045ee18a512",
@@ -35,7 +36,7 @@ const logsClient = createPublicClient({
   transport: http("https://mainnet.base.org", { timeout: 12_000 }),
 });
 
-const CACHE_KEY = "bushi.bukan.bidders.v1";
+const CACHE_KEY = "bushi.bukan.bidders.v2";
 
 type Cache = { to: string; addrs: string[] };
 
@@ -62,10 +63,10 @@ function writeCache(to: bigint, addrs: Set<string>) {
 
 function seed(): { to: bigint; addrs: Set<string> } {
   const cached = readCache();
-  if (cached && cached.to >= SEED_TO) return cached;
   const addrs = new Set(SEED);
   if (cached) for (const a of cached.addrs) addrs.add(a);
-  return { to: SEED_TO, addrs };
+  const to = cached && cached.to > SEED_TO ? cached.to : SEED_TO;
+  return { to, addrs };
 }
 
 let known = seed();

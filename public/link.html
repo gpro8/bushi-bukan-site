@@ -100,7 +100,7 @@
       </div>
       <button type="button" class="primary" id="signBtn" hidden>接続して署名</button>
       <p class="msg" id="status"></p>
-      <p class="hint" id="done" hidden>送信しました。この画面のまま 5 秒待ってから Discord に戻り、<strong>確認</strong> を押してください。『届いていません』と出たら、もう 5 秒待って再タップ。</p>
+      <p class="hint" id="done" hidden>送信しました。5秒待ってから、Discord の <strong>KUとのDM</strong> に戻り、<strong>確認</strong> を押してください。『届いていません』と出たら、もう一度確認。</p>
     </div>
   </div>
 <script>
@@ -149,7 +149,7 @@
   var hasEth = typeof window.ethereum !== "undefined";
   if (hasEth) {
     document.getElementById("signBtn").hidden = false;
-    document.getElementById("lede").textContent = "接続して署名 → Discord で確認。コピー不要です。";
+    document.getElementById("lede").textContent = "接続して署名 → KUのDMで確認。コピー不要です。";
   } else {
     document.getElementById("chooser").hidden = false;
   }
@@ -211,7 +211,7 @@
       status.textContent = "送信中…";
       await postSig(account, signature);
       document.getElementById("done").hidden = false;
-      status.textContent = "送信完了。5秒待ってから Discord で「確認」。";
+      status.textContent = "送信完了。5秒待ってから、KUのDMで「確認」。";
     } catch (e) {
       status.textContent = (e && e.message) ? e.message : "署名できませんでした。";
     }

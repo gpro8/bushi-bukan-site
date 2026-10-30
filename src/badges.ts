@@ -14,7 +14,7 @@ export type Badge = {
   adapter: "onchain" | "offchain";
 };
 
-const EXAM_MOTIF: Motif[] = ["ume", "ya", "kiku", "tomoe", "kiri", "rinpo"];
+const EXAM_MOTIF: Motif[] = ["ume", "ya", "rinpo", "tomoe", "kiri", "kiku"];
 
 export function collectBadges(
   snap: ChainSnap,

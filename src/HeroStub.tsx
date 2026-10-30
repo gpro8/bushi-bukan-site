@@ -3,7 +3,7 @@ import { KamonMark, type Motif } from "./kamon";
 import type { ChainSnap } from "./chain";
 import { cutoutSrc, type CollectionHold } from "./collection";
 
-const EXAM_MOTIF: Motif[] = ["ume", "ya", "kiku", "tomoe", "kiri", "rinpo"];
+const EXAM_MOTIF: Motif[] = ["ume", "ya", "rinpo", "tomoe", "kiri", "kiku"];
 
 function watermarkOf(snap: ChainSnap): Motif | null {
   if (snap.rank > 0) return "tsuru";

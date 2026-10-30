@@ -101,6 +101,16 @@ export function collectBadges(
     adapter: "offchain",
   });
   out.push({
+    id: "nanoka",
+    family: "nanoka",
+    motif: "michi",
+    label: "七日の走",
+    hint: "つなぐして七日走る",
+    lit: Boolean(events?.nanoka?.lit),
+    tint: "#cd5e3c",
+    adapter: "offchain",
+  });
+  out.push({
     id: "exam-sepolia",
     family: "testnet",
     motif: "ume",

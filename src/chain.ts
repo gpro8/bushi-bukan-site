@@ -343,6 +343,7 @@ export async function loadSuke(wallet: string): Promise<SukeSnap | null> {
 
 export type EventSnap = {
   asobi?: { lit: boolean; vols: number[]; tier: number };
+  nanoka?: { lit: boolean };
   auction_test?: { lit: boolean; tier: number };
   sukedachi_test?: { lit: boolean; tier: number };
 };

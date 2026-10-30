@@ -10,7 +10,8 @@ export type Motif =
   | "nobori"
   | "shippo"
   | "nami"
-  | "cho";
+  | "cho"
+  | "michi";
 
 function Svg({ children }: { children: ReactNode }) {
   return (
@@ -183,6 +184,16 @@ function Cho() {
   );
 }
 
+function Michi() {
+  return (
+    <Svg>
+      <circle cx="20" cy="42" r="5" fill="currentColor" />
+      <circle cx="32" cy="32" r="5" fill="currentColor" />
+      <circle cx="44" cy="22" r="5" fill="currentColor" />
+    </Svg>
+  );
+}
+
 const MAP: Record<Motif, () => ReactNode> = {
   ume: Ume,
   ya: Ya,
@@ -194,6 +205,7 @@ const MAP: Record<Motif, () => ReactNode> = {
   shippo: Shippo,
   nami: Nami,
   cho: Cho,
+  michi: Michi,
 };
 
 export function KamonMark({ motif }: { motif: Motif }) {

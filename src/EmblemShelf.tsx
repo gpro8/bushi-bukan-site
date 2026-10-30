@@ -27,7 +27,9 @@ export function EmblemShelf({
   const ordered = useMemo(() => {
     const lit = badges.filter((b) => b.lit);
     const dark = badges.filter((b) => !b.lit);
-    return [...lit, ...dark];
+    const pin = dark.filter((b) => b.id === "nanoka");
+    const rest = dark.filter((b) => b.id !== "nanoka");
+    return [...lit, ...pin, ...rest];
   }, [badges]);
   const [open, setOpen] = useState(false);
   const [sel, setSel] = useState<string | null>(null);

@@ -40,7 +40,7 @@ export function collectBadges(
   out.push({
     id: "rank",
     family: "rank",
-    motif: "kiku",
+    motif: "tsuru",
     label: deni ? `伝位・${deni.ja}` : "伝位",
     hint: "Rank SBT を持つと点灯（義は増えない）",
     lit: snap.rank > 0,
@@ -103,9 +103,9 @@ export function collectBadges(
   out.push({
     id: "nanoka",
     family: "nanoka",
-    motif: "michi",
+    motif: "shichiyo",
     label: "七日の走",
-    hint: "つなぐして七日走る",
+    hint: "「つなぐ」で七日走ると点灯",
     lit: Boolean(events?.nanoka?.lit),
     tint: "#cd5e3c",
     adapter: "offchain",
@@ -113,7 +113,7 @@ export function collectBadges(
   out.push({
     id: "exam-sepolia",
     family: "testnet",
-    motif: "ume",
+    motif: "matsu",
     label: "試験・検定",
     hint: "Base Sepolia のいずれかの ExamPass を持つと点灯（本番の伝位にはならない）",
     lit: Boolean(test?.exam),
@@ -122,7 +122,7 @@ export function collectBadges(
   out.push({
     id: "rank-sepolia",
     family: "testnet",
-    motif: "tomoe",
+    motif: "tsuki",
     label: "試験・伝位",
     hint: "Base Sepolia のいずれかの Rank SBT を持つと点灯（本番の伝位にはならない）",
     lit: Boolean(test?.rank),
@@ -131,9 +131,9 @@ export function collectBadges(
   out.push({
     id: "auction",
     family: "auction",
-    motif: "kiri",
+    motif: "ogi",
     label: "出陣",
-    hint: "武士コレの競売に参加すると点灯。第1回は終了",
+    hint: "武士コレの競売に参加すると点灯",
     lit: bidLit,
     adapter: "onchain",
   });

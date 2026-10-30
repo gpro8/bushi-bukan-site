@@ -11,7 +11,11 @@ export type Motif =
   | "shippo"
   | "nami"
   | "cho"
-  | "michi";
+  | "shichiyo"
+  | "ogi"
+  | "matsu"
+  | "tsuki"
+  | "tsuru";
 
 function Svg({ children }: { children: ReactNode }) {
   return (
@@ -184,12 +188,73 @@ function Cho() {
   );
 }
 
-function Michi() {
+function Shichiyo() {
+  const stars = Array.from({ length: 7 }, (_, i) => {
+    const a = ((i * 360) / 7 - 90) * (Math.PI / 180);
+    return { cx: 32 + Math.cos(a) * 13.5, cy: 32 + Math.sin(a) * 13.5 };
+  });
   return (
     <Svg>
-      <circle cx="20" cy="42" r="5" fill="currentColor" />
-      <circle cx="32" cy="32" r="5" fill="currentColor" />
-      <circle cx="44" cy="22" r="5" fill="currentColor" />
+      {stars.map((p, i) => (
+        <circle key={i} cx={p.cx} cy={p.cy} r="3.2" fill="currentColor" />
+      ))}
+    </Svg>
+  );
+}
+
+function Ogi() {
+  const ribs = [-48, -24, 0, 24, 48];
+  return (
+    <Svg>
+      <path d="M16 30 Q32 10 48 30" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      {ribs.map((deg) => {
+        const a = ((deg - 90) * Math.PI) / 180;
+        return (
+          <line
+            key={deg}
+            x1="32"
+            y1="46"
+            x2={32 + Math.cos(a) * 20}
+            y2={46 + Math.sin(a) * 20}
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+        );
+      })}
+      <circle cx="32" cy="46" r="2.3" fill="currentColor" />
+    </Svg>
+  );
+}
+
+function Matsu() {
+  return (
+    <Svg>
+      <path d="M32 50 V28" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M32 36 L22 24" stroke="currentColor" strokeWidth="2" />
+      <path d="M32 36 L42 24" stroke="currentColor" strokeWidth="2" />
+      <path d="M22 24 L16 16 M22 24 L24 14 M22 24 L28 16" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M42 24 L36 16 M42 24 L40 14 M42 24 L48 16" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M32 28 L26 16 M32 28 L32 12 M32 28 L38 16" stroke="currentColor" strokeWidth="1.6" />
+    </Svg>
+  );
+}
+
+function Tsuki() {
+  return (
+    <Svg>
+      <circle cx="30" cy="32" r="12" fill="currentColor" />
+      <circle cx="36" cy="28" r="10" fill="var(--panel)" />
+    </Svg>
+  );
+}
+
+function Tsuru() {
+  return (
+    <Svg>
+      <path d="M18 40 Q28 18 40 22 Q48 24 46 32 Q44 40 34 42 Q24 44 18 40 Z" fill="currentColor" />
+      <path d="M40 24 Q46 16 50 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M22 34 Q14 28 12 22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="48" cy="14" r="1.6" fill="currentColor" />
     </Svg>
   );
 }
@@ -205,7 +270,11 @@ const MAP: Record<Motif, () => ReactNode> = {
   shippo: Shippo,
   nami: Nami,
   cho: Cho,
-  michi: Michi,
+  shichiyo: Shichiyo,
+  ogi: Ogi,
+  matsu: Matsu,
+  tsuki: Tsuki,
+  tsuru: Tsuru,
 };
 
 export function KamonMark({ motif }: { motif: Motif }) {

@@ -6,7 +6,7 @@ import { cutoutSrc, type CollectionHold } from "./collection";
 const EXAM_MOTIF: Motif[] = ["ume", "ya", "kiku", "tomoe", "kiri", "rinpo"];
 
 function watermarkOf(snap: ChainSnap): Motif | null {
-  if (snap.rank > 0) return "kiku";
+  if (snap.rank > 0) return "tsuru";
   for (let i = snap.exam.length - 1; i >= 0; i--) {
     if (snap.exam[i]) return EXAM_MOTIF[i];
   }

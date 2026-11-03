@@ -20,6 +20,7 @@ import {
   type TestSnap,
 } from "./chain";
 import { EmblemShelf } from "./EmblemShelf";
+import { KamonMark } from "./kamon";
 import { DigitPop } from "./DigitPop";
 import { HeroCopy, HeroStub } from "./HeroStub";
 import { loadCollection, type CollectionHold } from "./collection";
@@ -310,7 +311,18 @@ export function App() {
               </div>
               <div className="slot">検定 ExamPass · {passed}</div>
               <div className="slot">家格 · 倍率なし（Rank は義を増やさない）</div>
-              <div className="slot muted">蔵 / ミント · 未定のため非表示</div>
+              <div className={`slot${events ? "" : " muted"}`}>
+                {events ? `蔵／ミント権 ${events.nanoka?.lit ? 1 : 0}` : "蔵／ミント権 · …"}
+              </div>
+              {events?.nanoka?.lit ? (
+                <div className="pass">
+                  <span className="pass-mon" aria-hidden="true">
+                    <KamonMark motif="shichiyo" />
+                  </span>
+                  <p className="pass-name">七日の走</p>
+                  <p className="pass-line">この誉は、蔵が開くときの資格です</p>
+                </div>
+              ) : null}
             </div>
           </div>
 

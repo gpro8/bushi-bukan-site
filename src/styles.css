@@ -359,6 +359,31 @@ h2 {
   padding: 0.4rem 0;
   border-bottom: 1px dashed var(--line);
 }
+.pass {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.9rem 0 0.15rem;
+}
+.pass-mon {
+  width: 88px;
+  height: 88px;
+  color: #cd5e3c;
+}
+.pass-mon .mon-svg {
+  width: 88px;
+  height: 88px;
+}
+.pass-name {
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.pass-line {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
 .shelf {
   max-width: 960px;
   margin: 0.75rem auto 0;

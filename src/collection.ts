@@ -66,11 +66,10 @@ async function readMeta(tokenURI: string): Promise<{
 }
 
 /** Cutout on GH Pages — not the NFT JPEG. Missing file → empty 和紙.
- * Token 1 stays the PNG he placed. Later lots are AVIF from the original PNG. */
+ * AVIF from the original PNG. Token 1's PNG file stays so an old script can still load it. */
 export function cutoutSrc(tokenId: number) {
   const base = import.meta.env.BASE_URL || "/";
-  const ext = tokenId === 1 ? "png" : "avif";
-  return `${base}cutouts/${tokenId}.${ext}`;
+  return `${base}cutouts/${tokenId}.avif`;
 }
 
 /** First Collection token among メイン + aliases. Soft-fail → []. */
